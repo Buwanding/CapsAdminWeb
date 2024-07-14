@@ -15,9 +15,9 @@ const Header = () => {
 
   return (
     <header className="bg-black text-white flex items-center justify-between p-4">
-      <div className="flex items-center space-x-2">
-        <img src={logo} alt="Logo" className="h-10 w-10" />
-        <span className="text-yellow-500 font-bold text-xl">PickMeUp</span>
+      <div className="p-4 flex items-center space-x-2">
+        {/* <img src={logo} alt="Logo" className="h-10 w-10" />
+        <span className="text-white font-bold text-xl">PickMeUp</span> */}
       </div>
       <div className="relative">
         <Menu>
@@ -34,7 +34,7 @@ const Header = () => {
                   className="h-6 w-6 rounded-full"
                 />
               </Menu.Button>
-              <Menu.Items className="absolute right-0 mt-2 w-48 bg-gray-200 shadow-lg rounded-lg overflow-hidden">
+              <Menu.Items className="absolute right-0 mt-2 w-48 bg-[#343536] shadow-lg rounded-lg overflow-hidden">
                 <Menu.Item>
                   {({ active }) => (
                     <a

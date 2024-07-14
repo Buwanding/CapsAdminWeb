@@ -2,10 +2,13 @@ import React from "react";
 import { Disclosure } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import logo from "../pictures/Pick-Me-Up-Logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Sidenav = () => {
+  const navigate = useNavigate();
+
   const handleClick = (item) => {
-    console.log(`${item} clicked`);
+    navigate(item);
   };
 
   return (
@@ -15,6 +18,12 @@ const Sidenav = () => {
         <span className="text-white font-bold text-xl">PickMeUp</span>
       </div>
       <div className="mt-4">
+        <button
+          onClick={() => handleClick("/dashboard")}
+          className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
+        >
+          Dashboard
+        </button>
         <Disclosure>
           {({ open }) => (
             <>
@@ -26,16 +35,16 @@ const Sidenav = () => {
               </Disclosure.Button>
               <Disclosure.Panel className="bg-gray-800 text-white">
                 <button
-                  onClick={() => handleClick("Rider 1")}
+                  onClick={() => handleClick("/riderslist")}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                 >
-                  Rider 1
+                  Rider Status
                 </button>
                 <button
-                  onClick={() => handleClick("Rider 2")}
+                  onClick={() => handleClick("/riderapplicants")}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                 >
-                  Rider 2
+                  Rider Applicant
                 </button>
               </Disclosure.Panel>
             </>
@@ -100,7 +109,7 @@ const Sidenav = () => {
           Manage Users
         </button>
         <button
-          onClick={() => handleClick("Feedback")}
+          onClick={() => handleClick("/feedback")}
           className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
         >
           Feedback

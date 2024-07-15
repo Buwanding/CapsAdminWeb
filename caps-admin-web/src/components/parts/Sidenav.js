@@ -41,7 +41,7 @@ const Sidenav = () => {
                   Rider Status
                 </button>
                 <button
-                  onClick={() => handleClick("/riderapplicants")}
+                  onClick={() => handleClick("/ridersapplicant")}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                 >
                   Rider Applicant
@@ -61,10 +61,10 @@ const Sidenav = () => {
               </Disclosure.Button>
               <Disclosure.Panel className="bg-gray-800 text-white">
                 <button
-                  onClick={() => handleClick("Booking 1")}
+                  onClick={() => handleClick("/bookinghistory")}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-700"
                 >
-                  Booking 1
+                  Booking History
                 </button>
                 <button
                   onClick={() => handleClick("Booking 2")}
@@ -103,7 +103,7 @@ const Sidenav = () => {
           )}
         </Disclosure>
         <button
-          onClick={() => handleClick("Manage Users")}
+          onClick={() => handleClick("/manageuser")}
           className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
         >
           Manage Users

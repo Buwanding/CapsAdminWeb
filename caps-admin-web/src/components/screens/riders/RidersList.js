@@ -1,6 +1,7 @@
 import React from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
+import logo from "../../pictures/Pick-Me-Up-Logo.png";
 
 const riders = [
   { name: "Thad Huber", phone: "+1 (143) 666-4411", status: "Active" },
@@ -26,11 +27,11 @@ const riders = [
 
 const RidersList = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <Sidenav />
-      <div className="flex flex-col flex-1">
+      <div className="flex-1">
         <Header />
-        <main className="flex-grow p-6 bg-gray-100">
+        <main className="p-4">
           <div className="bg-white shadow-md rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-2xl font-bold">RIDERS LIST</h1>

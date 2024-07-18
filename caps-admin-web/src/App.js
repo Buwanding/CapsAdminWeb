@@ -15,6 +15,7 @@ import { ManageUser } from "./components/screens/ManageUser";
 import { BookingHistory } from "./components/screens/BookingHistory";
 import { RidersApplicant } from "./components/screens/riders/RidersApplicant";
 import { AuthProvider } from "./context/AuthContext";
+import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
 
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
@@ -56,6 +57,7 @@ function App() {
               <Route path="/ridersapplicant" element={<RidersApplicant />} />
               <Route path="/manageuser" element={<ManageUser />} />
               <Route path="/bookinghistory" element={<BookingHistory />} />
+              <Route path="/manageadmin" element={<ManageAdmin />} />
             </Routes>
           </div>
         </AxiosInterceptor>

@@ -114,6 +114,12 @@ const Sidenav = () => {
         >
           Feedback
         </button>
+        <button
+          onClick={() => handleClick("/manageadmin")}
+          className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
+        >
+          Manage Admin
+        </button>
       </div>
     </div>
   );

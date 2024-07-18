@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-import logo from "./pictures/Pick-Me-Up-Logo.png";
+import Sidenav from "../../parts/Sidenav";
+import Header from "../../parts/Header";
 
 const users = [
   {
@@ -24,7 +25,7 @@ const users = [
 const UserCard = ({ user }) => {
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white mb-4 flex items-center">
-      <img src={avatar} alt="Avatar" className="h-12 w-12 rounded-full" />
+      <img src="" alt="Avatar" className="h-12 w-12 rounded-full" />
       <div className="ml-4 flex-1">
         <p className="font-bold">{user.name}</p>
         <p className="text-gray-600">Status: {user.status}</p>
@@ -103,40 +104,37 @@ const ManageAdmin = () => {
 
   return (
     <div className="flex">
-      <nav className="bg-gray-800 text-white w-64 h-screen p-4">
-        <ul>
-          <li className="mb-2">
-            <a href="/dashboard">Dashboard</a>
-          </li>
-          <li className="mb-2">
-            <a href="/users">Users</a>
-          </li>
-          <li className="mb-2">
-            <a href="/settings">Settings</a>
-          </li>
-        </ul>
-      </nav>
+      <Sidenav />
       <div className="flex-1">
-        <header className="bg-black text-white flex items-center justify-between p-4">
-          <div className="flex items-center space-x-2">
-            <img src={logo} alt="Logo" className="h-10 w-10" />
-            <span className="text-yellow-500 font-bold text-xl">PickMeUp</span>
+        <Header />
+        <main className="p-4">
+          <div className="flex">
+            <div className="flex-1">
+              <header className="bg-black text-white flex items-center justify-between p-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-white-500 font-bold text-xl">
+                    Admin Users
+                  </span>
+                </div>
+                <button
+                  className="bg-blue-500 text-white py-1 px-4 rounded"
+                  onClick={() => setShowForm(true)}
+                >
+                  Add New
+                </button>
+              </header>
+              <div className="p-4">
+                {showForm ? (
+                  <AddAdminForm setShowForm={setShowForm} />
+                ) : (
+                  users.map((user, index) => (
+                    <UserCard key={index} user={user} />
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-          <button
-            className="bg-blue-500 text-white py-1 px-4 rounded"
-            onClick={() => setShowForm(true)}
-          >
-            Add New
-          </button>
-        </header>
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Admin Users</h2>
-          {showForm ? (
-            <AddAdminForm setShowForm={setShowForm} />
-          ) : (
-            users.map((user, index) => <UserCard key={index} user={user} />)
-          )}
-        </div>
+        </main>
       </div>
     </div>
   );

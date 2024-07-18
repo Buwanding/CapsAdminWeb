@@ -15,11 +15,15 @@ const Header = () => {
       const token = localStorage.getItem('token');
   
       // Make a POST request to the logout endpoint
-      await axios.post('http://192.168.133.124:8000/api/user/logout', {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      await axios.post(
+        "http://192.168.1.7:8000/api/user/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
   
       // Clear the token and role from localStorage
       localStorage.removeItem('token');

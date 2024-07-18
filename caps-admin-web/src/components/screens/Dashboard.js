@@ -1,14 +1,22 @@
-import React from 'react'
-import Sidenav from '../parts/Sidenav'
-import Header from '../parts/Header'
+import React from "react";
+import Sidenav from "../parts/Sidenav";
+import Header from "../parts/Header";
+import { useAuth } from "../../hooks/useAuth";
+import { Navigate } from "react-router-dom";
 
 export const Dashboard = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
   return (
     <div className="flex">
       <Sidenav />
-      <div className="flex flex-col w-full">
+      <div className="flex-1">
         <Header />
-        <main className="flex-grow p-4 bg-gray-100">
+        <main className="p-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-yellow-500 p-4 rounded-lg shadow-md">
               <h2 className="text-xl font-bold">Active Riders</h2>
@@ -35,4 +43,4 @@ export const Dashboard = () => {
       </div>
     </div>
   );
-}
+};

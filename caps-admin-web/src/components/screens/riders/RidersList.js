@@ -1,8 +1,6 @@
 import React from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
-import logo from "../../pictures/Pick-Me-Up-Logo.png";
-
 const riders = [
   { name: "Thad Huber", phone: "+1 (143) 666-4411", status: "Active" },
   { name: "Bethany Marquez", phone: "+1 (828) 738-0421", status: "Active" },

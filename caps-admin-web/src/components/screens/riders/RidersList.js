@@ -1,31 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
-import logo from "../../pictures/Pick-Me-Up-Logo.png";
+import API_URL from "../../../api_url";
 
-const riders = [
-  { name: "Thad Huber", phone: "+1 (143) 666-4411", status: "Active" },
-  { name: "Bethany Marquez", phone: "+1 (828) 738-0421", status: "Active" },
-  { name: "Erin Flowers", phone: "+1 (927) 648-1327", status: "Active" },
-  {
-    name: "Gil Vincent",
-    phone: "+1 (785) 353-7165",
-    status: "Disable for 12 hours",
-  },
-  {
-    name: "Jayne Oliver",
-    phone: "+1 (573) 719-7080",
-    status: "Disable for 42 hours",
-  },
-  { name: "Sonny Ali", phone: "+1 (209) 973-0709", status: "Active" },
-  {
-    name: "Tracy Moreno",
-    phone: "+1 (837) 677-2597",
-    status: "Disable for 100 hours",
-  },
-];
 
 const RidersList = () => {
+  const [riders, setRiders] = useState([]);
+
+  useEffect(() => {
+    const fetchRiders = async () => {
+      try {
+        const response = await axios.get(API_URL+ 'user/riders');
+        setRiders(response.data);
+      } catch (error) {
+        console.error("There was an error fetching the riders!", error);
+      }
+    };
+
+    fetchRiders();
+  }, []);
+
   return (
     <div className="flex">
       <Sidenav />
@@ -55,8 +50,8 @@ const RidersList = () => {
               <tbody>
                 {riders.map((rider, index) => (
                   <tr key={index} className="border-t">
-                    <td className="px-4 py-2">{rider.name}</td>
-                    <td className="px-4 py-2">{rider.phone}</td>
+                    <td className="px-4 py-2">{rider.first_name} {rider.last_name}</td>
+                    <td className="px-4 py-2">{rider.mobile_number}</td>
                     <td className="px-4 py-2">
                       {rider.status === "Active" ? (
                         <span className="inline-flex items-center">

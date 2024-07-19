@@ -15,10 +15,12 @@ import { ManageUser } from "./components/screens/ManageUser";
 import { BookingHistory } from "./components/screens/BookingHistory";
 import { RidersApplicant } from "./components/screens/riders/RidersApplicant";
 import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
 
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
@@ -26,8 +28,7 @@ const AxiosInterceptor = ({ children }) => {
       (error) => {
         if (error.response && error.response.status === 401) {
           // Token has expired or is invalid
-          localStorage.removeItem('token');
-          localStorage.removeItem('role');
+          logout();
           navigate('/');
         }
         return Promise.reject(error);
@@ -38,10 +39,45 @@ const AxiosInterceptor = ({ children }) => {
       // Remove the interceptor when the component unmounts
       axios.interceptors.response.eject(interceptor);
     };
-  }, [navigate]);
+  }, [navigate, logout]);
 
   return children;
 };
+
+// const ProtectedRoute = ({ children }) => {
+//   const { isAuthenticated, loading } = useAuth();
+
+//   if (loading) {
+//     return <div>Loading...</div>; // Or a more sophisticated loading indicator
+//   }
+
+//   if (!isAuthenticated) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   return children;
+// };
+
+function AppContent() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a more sophisticated loading indicator
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/feedback" element={<Feedback />} />
+      <Route path="/riderslist" element={<RidersList />} />
+      <Route path="/ridersapplicant" element={<RidersApplicant />} />
+      <Route path="/manageuser" element={<ManageUser />} />
+      <Route path="/bookinghistory" element={<BookingHistory />} />
+      <Route path="/manageadmin" element={<ManageAdmin />} />
+    </Routes>
+  );
+}
 
 function App() {
   return (
@@ -49,16 +85,7 @@ function App() {
       <Router>
         <AxiosInterceptor>
           <div className="App">
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/riderslist" element={<RidersList />} />
-              <Route path="/ridersapplicant" element={<RidersApplicant />} />
-              <Route path="/manageuser" element={<ManageUser />} />
-              <Route path="/bookinghistory" element={<BookingHistory />} />
-              <Route path="/manageadmin" element={<ManageAdmin />} />
-            </Routes>
+            <AppContent />
           </div>
         </AxiosInterceptor>
       </Router>

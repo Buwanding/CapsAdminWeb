@@ -2,12 +2,16 @@ import React from "react";
 import { Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { useNavigate } from "react-router-dom";
-import logo from "../pictures/Pick-Me-Up-Logo.png";
+// import logo from "../pictures/Pick-Me-Up-Logo.png";
 import UserIcon from "../pictures/User-icon.png";
 import axios from 'axios';
+import API_URL from "../../api_url";
+import { useAuth } from "../../hooks/useAuth";
+
 
 const Header = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();  // Use the logout function from useAuth
 
   const handleLogout = async () => {
     try {
@@ -15,22 +19,17 @@ const Header = () => {
       const token = localStorage.getItem('token');
   
       // Make a POST request to the logout endpoint
-      await axios.post(
-        "http://192.168.1.7:8000/api/user/logout",
-        {},
-        {
+      await axios.post(API_URL + 'user/logout', {}, {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          'Authorization': `Bearer ${token}`
         }
-      );
+      });
   
-      // Clear the token and role from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      // Use the logout function from useAuth
+      logout();
   
       // Navigate to the login page
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error('Logout failed', error);
       // Handle any errors (e.g., show an error message to the user)

@@ -73,8 +73,8 @@ function AppContent() {
       <Route path="/riderslist" element={<RidersList />} />
       <Route path="/ridersapplicant" element={<RidersApplicant />} />
       <Route path="/manageuser" element={<ManageUser />} />
-      <Route path="/bookinghistory" element={<BookingHistory />} />
       <Route path="/manageadmin" element={<ManageAdmin />} />
+      <Route path="/bookinghistory" element={<BookingHistory />} />
     </Routes>
   );
 }

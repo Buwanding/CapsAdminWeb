@@ -3,9 +3,11 @@ import { Disclosure } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import logo from "../pictures/Pick-Me-Up-Logo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const Sidenav = () => {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
 
   const handleClick = (item) => {
     navigate(item);
@@ -108,18 +110,23 @@ const Sidenav = () => {
         >
           Manage Users
         </button>
+
+        {userRole === 1 && (
+          <button
+            onClick={() => handleClick("/manageadmin")}
+            className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
+          >
+            Manage Admin
+          </button>
+        )}
+        
         <button
           onClick={() => handleClick("/feedback")}
           className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
         >
           Feedback
         </button>
-        <button
-          onClick={() => handleClick("/manageadmin")}
-          className="block w-full text-left px-4 py-2 text-black bg-yellow-500 hover:bg-yellow-600"
-        >
-          Manage Admin
-        </button>
+        
       </div>
     </div>
   );

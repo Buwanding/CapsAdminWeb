@@ -6,9 +6,9 @@ export const BookingHistory = () => {
   return (
     <div className="flex">
       <Sidenav />
-      <div className="flex-1">
+      <div className="flex flex-col w-full">
         <Header />
-        <main className="p-4">
+        <main className="flex-grow p-4 bg-gray-100">
           <div className="p-4">
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="p-4 border-b border-gray-200">

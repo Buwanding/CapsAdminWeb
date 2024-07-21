@@ -2,33 +2,18 @@ import React from "react";
 import { Menu } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { useNavigate } from "react-router-dom";
-// import logo from "../pictures/Pick-Me-Up-Logo.png";
 import UserIcon from "../pictures/User-icon.png";
-import axios from 'axios';
-import API_URL from "../../api_url";
+import userService from "../../services";
 import { useAuth } from "../../hooks/useAuth";
-
 
 const Header = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();  // Use the logout function from useAuth
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      // Get the token from localStorage
-      const token = localStorage.getItem('token');
-  
-      // Make a POST request to the logout endpoint
-      await axios.post(API_URL + 'user/logout', {}, {
-          headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-  
-      // Use the logout function from useAuth
+      await userService.logout();
       logout();
-  
-      // Navigate to the login page
       navigate('/');
     } catch (error) {
       console.error('Logout failed', error);

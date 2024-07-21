@@ -8,9 +8,9 @@ export const Feedback = () => {
   return (
     <div className="flex">
       <Sidenav />
-      <div className="flex-1">
+      <div className="flex flex-col w-full">
         <Header />
-        <main className="p-4">
+        <main className="flex-grow p-4 bg-gray-100">
           <div className="bg-white p-8 rounded-lg shadow-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold">Feedback</h2>

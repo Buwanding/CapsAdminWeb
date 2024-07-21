@@ -1,51 +1,41 @@
-import React, { useState } from "react";
-// import { ChevronDownIcon } from "@heroicons/react/solid";
+import React, { useEffect, useState } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
+import userService from "../../../services";
 
-const users = [
-  {
-    name: "Ileana Mai",
-    status: "active",
-  },
-  {
-    name: "Conchúr Regina",
-    status: "active",
-  },
-  {
-    name: "Raphael Gioachino",
-    status: "deactivated",
-  },
-  {
-    name: "Tadgh Masaharu",
-    status: "deactivated",
-  },
-];
-
-const UserCard = ({ user }) => {
+const UserCard = ({ admin }) => {
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white mb-4 flex items-center">
       <img src="" alt="Avatar" className="h-12 w-12 rounded-full" />
       <div className="ml-4 flex-1">
-        <p className="font-bold">{user.name}</p>
-        <p className="text-gray-600">Status: {user.status}</p>
+        <p className="font-bold">{admin.first_name} {admin.last_name}</p>
+        <p className="text-gray-400 font-bold">
+          Status: <span className={`${admin.status === "Active" ? "text-green-600" : "text-red-600"}`}>
+            {admin.status}
+          </span>
+        </p>
       </div>
       <div className="flex space-x-2">
-        <button className="bg-green-500 text-white py-1 px-2 rounded">
-          Enable
-        </button>
-        <button className="bg-red-500 text-white py-1 px-2 rounded">
-          Disable
-        </button>
+        {admin.status === "Active" ? (
+          <button className="bg-red-500 text-white py-1 px-2 rounded">
+            Disable
+          </button>
+        ): (
+          <button className="bg-green-500 text-white py-1 px-2 rounded">
+            Enable
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
+
 const AddAdminForm = ({ setShowForm }) => {
+
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white mb-4">
-      <h2 className="text-xl font-bold mb-4">New Super Admin</h2>
+      <h2 className="text-xl font-bold mb-4">New Admin</h2>
       <form>
         <div className="mb-4">
           <label className="block text-gray-700">Username:</label>
@@ -101,13 +91,28 @@ const AddAdminForm = ({ setShowForm }) => {
 
 const ManageAdmin = () => {
   const [showForm, setShowForm] = useState(false);
+  const [admin, setAdmin] = useState([]);
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const data = await userService.fetchAdmin();
+        setAdmin(data);
+      } catch (error) {
+        console.error("There was an error fetching the Customers!", error);
+      }
+    };
+
+    fetchAdmin();
+  }, []);
+
 
   return (
     <div className="flex">
       <Sidenav />
-      <div className="flex-1">
+      <div className="flex flex-col w-full">
         <Header />
-        <main className="p-4">
+        <main className="flex-grow p-4 bg-gray-100">
           <div className="flex">
             <div className="flex-1">
               <header className="bg-black text-white flex items-center justify-between p-4">
@@ -127,8 +132,8 @@ const ManageAdmin = () => {
                 {showForm ? (
                   <AddAdminForm setShowForm={setShowForm} />
                 ) : (
-                  users.map((user, index) => (
-                    <UserCard key={index} user={user} />
+                  admin.map((admin, index) => (
+                    <UserCard key={index} admin={admin} />
                   ))
                 )}
               </div>

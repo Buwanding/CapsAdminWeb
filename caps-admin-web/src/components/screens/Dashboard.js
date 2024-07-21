@@ -3,8 +3,8 @@ import Sidenav from '../parts/Sidenav';
 import Header from '../parts/Header';
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
-import API_URL from "../../api_url";
+import userService from '../../services';
+
 
 export const Dashboard = () => {
   const { isAuthenticated } = useAuth();
@@ -16,13 +16,16 @@ export const Dashboard = () => {
   });
 
   useEffect(() => {
-    axios.get(API_URL + 'user/dashboard/counts')
-      .then(response => {
-        setCounts(response.data);
-      })
-      .catch(error => {
+    const fetchDashboardCounts = async () => {
+      try {
+        const data = await userService.getDashboardCounts();
+        setCounts(data);
+      } catch (error) {
         console.error('There was an error fetching the counts!', error);
-      });
+      }
+    };
+
+    fetchDashboardCounts();
   }, []);
 
   if (!isAuthenticated) {

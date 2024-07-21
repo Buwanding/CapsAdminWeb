@@ -1,10 +1,9 @@
-// src/components/screens/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import logo from "../pictures/Pick-Me-Up-Logo.png";
-import API_URL from "../../api_url";
 import { useAuth } from "../../hooks/useAuth";
+import userService from "../../services";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,12 +19,7 @@ const Login = () => {
     setIsLoading(true);
   
     try {
-      const response = await axios.post(API_URL + "user/login", {
-          email,
-          password,
-      });
-
-      const { token, role } = response.data;
+      const { token, role } = await userService.login(email, password);
 
       if (role !== 1 && role !== 2) {
         setError("Unauthorized access");

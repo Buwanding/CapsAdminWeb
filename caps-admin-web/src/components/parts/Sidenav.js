@@ -18,18 +18,16 @@ const Sidenav = () => {
 
   const menuItems = [
     { path: "/dashboard", label: "Dashboard" },
-    { path: "/riderslist", label: "Rider Status", parent: "Riders" },
-    { path: "/ridersapplicant", label: "Rider Applicant", parent: "Riders" },
+    { path: "/riderslist", label: "Manage Riders", parent: "Riders" },
+    { path: "/ridersapplicant", label: "Rider Applications", parent: "Riders" },
     { path: "/manageuser", label: "Manage Users" },
     { path: "/manageadmin", label: "Manage Admin", role: 1 },
     { path: "/bookinghistory", label: "Booking History" },
     { path: "/feedback", label: "Feedback" },
   ];
 
-  const parentItems = ["Riders"];
-
   const isActive = (path) => location.pathname === path;
-  const isParentActive = (parent) => menuItems.filter(item => item.parent === parent).some(item => isActive(item.path));
+  const isParentActive = (parent) => menuItems.filter(item => item.parent === parent).some(item => isActive(item.path)) || location.pathname.startsWith('/riders');
 
   return (
     <div className="bg-yellow-500 w-64 h-screen">

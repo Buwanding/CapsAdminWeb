@@ -1,9 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import Sidenav from "../parts/Sidenav";
 import Header from "../parts/Header";
-
+import userService from '../../services';
 
 export const Feedback = () => {
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const data = await userService.fetchFeedbacks();
+        setFeedbacks(data);
+      } catch (error) {
+        console.error("There was an error fetching the feedbacks!", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeedbacks();
+  }, []);
+
+  // Ensure you are filtering based on correct field names
+  const filteredFeedbacks = feedbacks.filter((feedback) =>
+    `${feedback.sender_first_name || ''} ${feedback.sender_last_name || ''}`
+      .toLowerCase()
+      .includes(searchInput.toLowerCase())
+  );
 
   return (
     <div className="flex">
@@ -19,57 +44,53 @@ export const Feedback = () => {
                   type="text"
                   placeholder="Search Names"
                   className="px-4 py-2 border rounded-lg"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                 />
                 <button className="px-4 py-2 bg-gray-200 rounded-lg">
                   Filter
                 </button>
               </div>
             </div>
+            {loading ? (
+                <div className="p-4 text-center">Loading...</div>
+              ) : (
             <table className="w-full bg-gray-100 rounded-lg shadow">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="p-4 text-left">Description</th>
-                  <th className="p-4 text-left">Reporter Name</th>
-                  <th className="p-4 text-left">Reported Name</th>
-                  <th className="p-4 text-left">Customer/Rider</th>
+                  <th className="p-4 text-left">Sender</th>
+                  <th className="p-4 text-left">Comment</th>
+                  <th className="p-4 text-left">Recipient</th>
+                  <th className="p-4 text-left">Sender Type</th>
                   <th className="p-4 text-left">Date</th>
-                  <th className="p-4 text-left">Location</th>
+                  <th className="p-4 text-left">Ride ID</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-b">
-                  <td className="p-4">
-                    Rider is not friendly and drop on wrong location
-                  </td>
-                  <td className="p-4">Tadgh Masaharu</td>
-                  <td className="p-4">Hiroki Augusta</td>
-                  <td className="p-4">Customer</td>
-                  <td className="p-4">5.12.2024</td>
-                  <td className="p-4">Baluulang</td>
-                </tr>
-                <tr className="bg-white border-b">
-                  <td className="p-4">Customer did not play well</td>
-                  <td className="p-4">Tadgh Masaharu</td>
-                  <td className="p-4">Hiroki Augusta</td>
-                  <td className="p-4">Rider</td>
-                  <td className="p-4">5.12.2024</td>
-                  <td className="p-4">Baluulang</td>
-                </tr>
-                <tr className="bg-white">
-                  <td className="p-4">
-                    Rider is very responsible and friendly
-                  </td>
-                  <td className="p-4">Tadgh Masaharu</td>
-                  <td className="p-4">Hiroki Augusta</td>
-                  <td className="p-4">Customer</td>
-                  <td className="p-4">5.12.2024</td>
-                  <td className="p-4">Baluulang</td>
-                </tr>
+                {filteredFeedbacks.map(feedback => (
+                  <tr className="bg-white border-b" key={feedback.feedback_id}>
+                    <td className="p-4">
+                      {feedback.sender_first_name && feedback.sender_last_name
+                        ? `${feedback.sender_first_name} ${feedback.sender_last_name}`
+                        : 'N/A'}
+                    </td>
+                    <td className="p-4">{feedback.comment || 'N/A'}</td>
+                    <td className="p-4">
+                      {feedback.recipient_first_name && feedback.recipient_last_name
+                        ? `${feedback.recipient_first_name} ${feedback.recipient_last_name}`
+                        : 'N/A'}
+                    </td>
+                    <td className="p-4">{feedback.sender_type ? feedback.sender_type.split('\\').pop() : 'N/A'}</td>
+                    <td className="p-4">{feedback.created_at ? new Date(feedback.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td className="p-4">{feedback.ride_id || 'N/A'}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
+            )}
           </div>
         </main>
       </div>
     </div>
   );
-}
+};

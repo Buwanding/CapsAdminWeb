@@ -5,12 +5,18 @@ import userService from "../../../services";
 
 const RidersList = () => {
   const [riders, setRiders] = useState([]);
+  const [selectedRiders, setSelectedRiders] = useState([]);
+  const [loadingActivate, setLoadingActivate] = useState(false);
+  const [loadingDisable, setLoadingDisable] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredRiders, setFilteredRiders] = useState([]);
 
   useEffect(() => {
     const fetchRiders = async () => {
       try {
         const data = await userService.fetchRiders();
         setRiders(data);
+        setFilteredRiders(data);
       } catch (error) {
         console.error("There was an error fetching the riders!", error);
       }
@@ -18,6 +24,81 @@ const RidersList = () => {
 
     fetchRiders();
   }, []);
+
+  const handleSelectRider = (riderId) => {
+    setSelectedRiders((prevSelectedRiders) => {
+      if (prevSelectedRiders.includes(riderId)) {
+        return prevSelectedRiders.filter((id) => id !== riderId);
+      } else {
+        return [...prevSelectedRiders, riderId];
+      }
+    });
+  };
+
+  const handleActivateRiders = async () => {
+    setLoadingActivate(true);
+    try {
+      await Promise.all(
+        selectedRiders.map((riderId) =>
+          userService.updateUserStatus(riderId, "Active")
+        )
+      );
+      setRiders((prevRiders) =>
+        prevRiders.map((rider) =>
+          selectedRiders.includes(rider.user_id)
+            ? { ...rider, status: "Active" }
+            : rider
+        )
+      );
+      setSelectedRiders([]);
+    } catch (error) {
+      console.error("Error activating riders:", error);
+    } finally {
+      setLoadingActivate(false);
+    }
+  };
+
+  const handleDisableRiders = async () => {
+    setLoadingDisable(true);
+    try {
+      await Promise.all(
+        selectedRiders.map((riderId) =>
+          userService.updateUserStatus(riderId, "Disabled")
+        )
+      );
+      setRiders((prevRiders) =>
+        prevRiders.map((rider) =>
+          selectedRiders.includes(rider.user_id)
+            ? { ...rider, status: "Disabled" }
+            : rider
+        )
+      );
+      setSelectedRiders([]);
+    } catch (error) {
+      console.error("Error disabling riders:", error);
+    } finally {
+      setLoadingDisable(false);
+    }
+  };
+
+  const isAnySelectedActive = selectedRiders.some((riderId) => {
+    const rider = riders.find((r) => r.user_id === riderId);
+    return rider?.status === "Active";
+  });
+
+  const isAnySelectedDisabled = selectedRiders.some((riderId) => {
+    const rider = riders.find((r) => r.user_id === riderId);
+    return rider?.status === "Disabled";
+  });
+
+  const handleFilter = () => {
+    const filtered = riders.filter((rider) =>
+      `${rider.first_name} ${rider.last_name}`
+        .toLowerCase()
+        .includes(searchInput.toLowerCase())
+    );
+    setFilteredRiders(filtered);
+  };
 
   return (
     <div className="flex">
@@ -33,13 +114,36 @@ const RidersList = () => {
                   type="text"
                   placeholder="Search Names"
                   className="px-4 py-2 border rounded-lg"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                 />
-                <button className="px-4 py-2 border rounded-lg">Filter</button>
+                <button
+                  className="px-4 py-2 border rounded-lg"
+                  onClick={handleFilter}
+                >
+                  Filter
+                </button>
               </div>
             </div>
             <table className="w-full text-left table-auto">
               <thead>
                 <tr>
+                  <th className="px-4 py-2">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedRiders(riders.map((rider) => rider.user_id));
+                        } else {
+                          setSelectedRiders([]);
+                        }
+                      }}
+                      checked={
+                        selectedRiders.length === riders.length &&
+                        riders.length > 0
+                      }
+                    />
+                  </th>
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Phone Number</th>
                   <th className="px-4 py-2">Status</th>
@@ -47,9 +151,18 @@ const RidersList = () => {
                 </tr>
               </thead>
               <tbody>
-                {riders.map((rider, index) => (
-                  <tr key={index} className="border-t">
-                    <td className="px-4 py-2">{rider.first_name} {rider.last_name}</td>
+                {filteredRiders.map((rider) => (
+                  <tr key={rider.user_id} className="border-t">
+                    <td className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedRiders.includes(rider.user_id)}
+                        onChange={() => handleSelectRider(rider.user_id)}
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      {rider.first_name} {rider.last_name}
+                    </td>
                     <td className="px-4 py-2">{rider.mobile_number}</td>
                     <td className="px-4 py-2">
                       {rider.status === "Active" ? (
@@ -82,12 +195,31 @@ const RidersList = () => {
               </tbody>
             </table>
             <div className="mt-6 flex items-center space-x-4">
-              <input type="time" className="border rounded-lg px-4 py-2" />
-              <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
-                Disable
+              <button
+                className={`${
+                  loadingDisable
+                    ? "bg-red-700"
+                    : isAnySelectedDisabled
+                    ? "bg-red-300"
+                    : "bg-red-500 hover:bg-red-700"
+                } text-white font-bold py-2 px-4 rounded-full`}
+                onClick={handleDisableRiders}
+                disabled={isAnySelectedDisabled || loadingDisable}
+              >
+                {loadingDisable ? "Disabling..." : "Disable"}
               </button>
-              <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">
-                Activate Rider
+              <button
+                className={`${
+                  loadingActivate
+                    ? "bg-green-700"
+                    : isAnySelectedActive
+                    ? "bg-green-300"
+                    : "bg-green-500 hover:bg-green-700"
+                } text-white font-bold py-2 px-4 rounded-full`}
+                onClick={handleActivateRiders}
+                disabled={isAnySelectedActive || loadingActivate}
+              >
+                {loadingActivate ? "Activating..." : "Activate Rider"}
               </button>
             </div>
           </div>

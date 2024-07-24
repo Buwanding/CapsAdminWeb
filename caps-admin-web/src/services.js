@@ -77,6 +77,26 @@ const userService = {
     }
   },
 
+  fetchHistory: async () => {
+    try {
+      const response = await axios.get(API_URL + 'history');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching feedbacks:', error);
+      throw error;
+    }
+  },
+
+  fetchFeedbacks: async () => {
+    try {
+      const response = await axios.get(API_URL + 'feedbacks');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching feedbacks:', error);
+      throw error;
+    }
+  },
+
 };
 
 export default userService;

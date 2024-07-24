@@ -20,6 +20,8 @@ const UserCard = ({ customer }) => {
     }
   };
 
+  
+
   return (
     <tr key={customer.user_id}>
       <td className="py-2 px-4 border-b border-gray-200">
@@ -71,12 +73,15 @@ const UserCard = ({ customer }) => {
 
 export const ManageUser = () => {
   const [customers, setCustomers] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const data = await userService.fetchCustomers();
         setCustomers(data);
+        setFilteredCustomers(data);
       } catch (error) {
         console.error("There was an error fetching the Customers!", error);
       }
@@ -84,6 +89,15 @@ export const ManageUser = () => {
 
     fetchCustomers();
   }, []);
+
+  const handleFilter = () => {
+    const filtered = customers.filter((customer) =>
+    `${customer.first_name} ${customer.last_name}`
+        .toLowerCase()
+        .includes(searchInput.toLowerCase())
+    );
+    setFilteredCustomers(filtered);
+  };
 
   return (
     <div className="flex">
@@ -100,8 +114,13 @@ export const ManageUser = () => {
                     type="text"
                     placeholder="Search Names"
                     className="border border-gray-300 rounded-l px-4 py-2"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  <button className="bg-gray-300 px-4 py-2 rounded-r">
+                  <button 
+                    className="bg-gray-300 px-4 py-2 rounded-r"
+                    onClick={handleFilter}
+                  >
                     Filter
                   </button>
                 </div>
@@ -118,7 +137,7 @@ export const ManageUser = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.map((customer) => (
+                {filteredCustomers.map((customer) => (
                     <UserCard key={customer.user_id} customer={customer} />
                   ))}
                 </tbody>

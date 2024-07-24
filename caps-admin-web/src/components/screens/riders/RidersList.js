@@ -8,12 +8,15 @@ const RidersList = () => {
   const [selectedRiders, setSelectedRiders] = useState([]);
   const [loadingActivate, setLoadingActivate] = useState(false);
   const [loadingDisable, setLoadingDisable] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredRiders, setFilteredRiders] = useState([]);
 
   useEffect(() => {
     const fetchRiders = async () => {
       try {
         const data = await userService.fetchRiders();
         setRiders(data);
+        setFilteredRiders(data);
       } catch (error) {
         console.error("There was an error fetching the riders!", error);
       }
@@ -88,6 +91,15 @@ const RidersList = () => {
     return rider?.status === "Disabled";
   });
 
+  const handleFilter = () => {
+    const filtered = riders.filter((rider) =>
+      `${rider.first_name} ${rider.last_name}`
+        .toLowerCase()
+        .includes(searchInput.toLowerCase())
+    );
+    setFilteredRiders(filtered);
+  };
+
   return (
     <div className="flex">
       <Sidenav />
@@ -102,8 +114,15 @@ const RidersList = () => {
                   type="text"
                   placeholder="Search Names"
                   className="px-4 py-2 border rounded-lg"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                 />
-                <button className="px-4 py-2 border rounded-lg">Filter</button>
+                <button
+                  className="px-4 py-2 border rounded-lg"
+                  onClick={handleFilter}
+                >
+                  Filter
+                </button>
               </div>
             </div>
             <table className="w-full text-left table-auto">
@@ -132,7 +151,7 @@ const RidersList = () => {
                 </tr>
               </thead>
               <tbody>
-                {riders.map((rider) => (
+                {filteredRiders.map((rider) => (
                   <tr key={rider.user_id} className="border-t">
                     <td className="px-4 py-2">
                       <input

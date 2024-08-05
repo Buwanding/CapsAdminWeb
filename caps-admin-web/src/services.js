@@ -18,6 +18,17 @@ const userService = {
       }
     });
   },
+  
+
+  signup: async (userData) => {
+    try {
+      const response = await axios.post(API_URL + 'signup', userData);
+      return response.data; // Return the response data
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
+  },
 
   getDashboardCounts: async () => {
     const response = await axios.get(API_URL + 'dashboard/counts');
@@ -43,6 +54,18 @@ const userService = {
     const response = await axios.get(API_URL + 'admin');
     return response.data;
   },
+
+  getAdminById: async (editingAdminId) => {
+    const response = await axios.get(API_URL + 'admin/' + editingAdminId);
+    return response.data;
+  },
+
+  updateAdmin: async (editingAdminId, adminData) => {
+    const response = await axios.put(API_URL + 'admin/' + editingAdminId);
+    return response.data;
+  },
+
+  
 
   updateAdminStatus: async (userId, status) => {
     try {

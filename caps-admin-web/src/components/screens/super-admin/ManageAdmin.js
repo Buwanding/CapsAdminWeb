@@ -2,20 +2,21 @@ import React, { useEffect, useState } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
+import AddAdminForm from "./AddAdminForm"; // Import the AddAdminForm component
 
-const UserCard = ({ admin, onStatusChange }) => {
+const UserCard = ({ admin, onStatusChange, onEdit }) => {
   const [loading, setLoading] = useState(false);
 
   const handleStatusChange = async () => {
     try {
-      setLoading(true); // Set loading state to true
+      setLoading(true);
       const newStatus = admin.status === "Active" ? "Disabled" : "Active";
       await userService.updateAdminStatus(admin.user_id, newStatus);
       onStatusChange(admin.user_id, newStatus);
     } catch (error) {
       console.error(`Error updating user status for user ${admin.user_id}:`, error);
     } finally {
-      setLoading(false); // Set loading state to false
+      setLoading(false);
     }
   };
 
@@ -30,95 +31,21 @@ const UserCard = ({ admin, onStatusChange }) => {
           </span>
         </p>
       </div>
-      <div className="flex space-x-2">
+      <div className="flex flex-col items-center">
+        <button
+          className="bg-yellow-500 text-white py-1 px-5 rounded mb-2 flex items-center justify-center"
+          onClick={() => onEdit(admin.user_id)}
+        >
+          Edit
+        </button>
         <button
           className={`${admin.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white py-1 px-2 rounded flex items-center justify-center`}
           onClick={handleStatusChange}
           disabled={loading}
         >
-          {loading ? (
-            <svg
-              className="animate-spin h-5 w-5 mr-2 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          ) : (
-            admin.status === "Active" ? "Disable" : "Enable"
-          )}
+          {loading ? "Loading..." : (admin.status === "Active" ? "Disable" : "Enable")}
         </button>
       </div>
-    </div>
-  );
-};
-
-const AddAdminForm = ({ setShowForm }) => {
-  return (
-    <div className="border p-4 rounded-lg shadow-sm bg-white mb-4">
-      <h2 className="text-xl font-bold mb-4">New Admin</h2>
-      <form>
-        <div className="mb-4">
-          <label className="block text-gray-700">Username:</label>
-          <input
-            type="text"
-            className="border rounded w-full py-2 px-3 text-gray-700"
-            defaultValue="Super-admin-1"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Password:</label>
-          <input
-            type="password"
-            className="border rounded w-full py-2 px-3 text-gray-700"
-            defaultValue="************"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Confirm Password:</label>
-          <input
-            type="password"
-            className="border rounded w-full py-2 px-3 text-gray-700"
-            defaultValue="************"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700">Email:</label>
-          <input
-            type="email"
-            className="border rounded w-full py-2 px-3 text-gray-700"
-            defaultValue="Super-admin-1@gmail.com"
-          />
-        </div>
-        <div className="flex justify-between">
-          <button
-            type="button"
-            className="bg-gray-500 text-white py-1 px-4 rounded"
-            onClick={() => setShowForm(false)}
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-1 px-4 rounded"
-          >
-            Save
-          </button>
-        </div>
-      </form>
     </div>
   );
 };
@@ -126,6 +53,7 @@ const AddAdminForm = ({ setShowForm }) => {
 const ManageAdmin = () => {
   const [showForm, setShowForm] = useState(false);
   const [admin, setAdmin] = useState([]);
+  const [editingAdminId, setEditingAdminId] = useState(null);
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -141,13 +69,21 @@ const ManageAdmin = () => {
   }, []);
 
   const handleStatusChange = (userId, newStatus) => {
-    console.log("handleStatusChange called with:", userId, newStatus);
-    setAdmin(prevAdmin => {
-      const newAdmin = prevAdmin.map(admin => 
-        admin.user_id === userId ? {...admin, status: newStatus} : admin
-      );
-      return newAdmin;
-    });
+    setAdmin((prevAdmin) =>
+      prevAdmin.map((admin) =>
+        admin.user_id === userId ? { ...admin, status: newStatus } : admin
+      )
+    );
+  };
+
+  const handleEdit = (userId) => {
+    setEditingAdminId(userId);
+    setShowForm(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingAdminId(null);
+    setShowForm(true);
   };
 
   return (
@@ -165,20 +101,31 @@ const ManageAdmin = () => {
                   </span>
                 </div>
                 <button
-                  className="bg-blue-500 text-white py-1 px-4 rounded"
-                  onClick={() => setShowForm(true)}
+                  className="bg-blue-500 text-white py-2 px-4 rounded"
+                  onClick={handleAddNew}
                 >
-                  Add New
+                  Add Admin
                 </button>
               </header>
+
               <div className="p-4">
-                {showForm ? (
-                  <AddAdminForm setShowForm={setShowForm} />
-                ) : (
-                  admin.map((adminUser, index) => (
-                    <UserCard key={index} admin={adminUser} onStatusChange={handleStatusChange} />
-                  ))
+                {showForm && (
+                  <AddAdminForm
+                    setShowForm={setShowForm}
+                    setAdmin={setAdmin}
+                    editingAdminId={editingAdminId}
+                  />
                 )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  {admin.map((adminUser) => (
+                    <UserCard
+                      key={adminUser.user_id}
+                      admin={adminUser}
+                      onStatusChange={handleStatusChange}
+                      onEdit={handleEdit}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>

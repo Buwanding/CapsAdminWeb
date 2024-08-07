@@ -9,7 +9,6 @@ export const BookingHistory = () => {
   const [customerSearch, setCustomerSearch] = useState("");
   const [riderSearch, setRiderSearch] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -31,7 +30,6 @@ export const BookingHistory = () => {
     setCustomerSearch("");
     setRiderSearch("");
     setStartDate("");
-    setEndDate("");
   };
 
   const filteredHistory = history.filter((booking) => {
@@ -42,10 +40,13 @@ export const BookingHistory = () => {
       ? `${booking.rider.first_name} ${booking.rider.last_name}`.toLowerCase()
       : "";
     const rideDate = new Date(booking.ride_date);
+    const formattedDate = rideDate.toLocaleDateString();
+    const formattedTime = rideDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const rideDateTime = `${formattedDate} ${formattedTime}`;
+    
+    const start = startDate ? new Date(startDate).toISOString().split("T")[0] : null;
 
-    const isWithinDateRange =
-      (!startDate || rideDate >= new Date(startDate)) &&
-      (!endDate || rideDate <= new Date(endDate));
+    const isWithinDateRange = !start || rideDate.toISOString().split("T")[0] === start;
 
     return (
       customerName.includes(customerSearch.toLowerCase()) &&
@@ -99,9 +100,15 @@ export const BookingHistory = () => {
                     <input
                       type="date"
                       className="border border-gray-300 rounded px-4 py-2"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
                     />
+                    <button
+                      className="px-4 py-2 bg-gray-200 rounded-lg"
+                      onClick={() => setStartDate("")}
+                    >
+                      Clear
+                    </button>
                   </div>
                   <button
                     className="px-4 py-2 bg-gray-200 rounded-lg"
@@ -117,9 +124,10 @@ export const BookingHistory = () => {
                 <table className="min-w-full bg-white">
                   <thead>
                     <tr>
+                      <th className="py-2 px-4 border-b border-gray-200 text-left">Ride ID</th>
                       <th className="py-2 px-4 border-b border-gray-200 text-left">Customer</th>
                       <th className="py-2 px-4 border-b border-gray-200">Rider</th>
-                      <th className="py-2 px-4 border-b border-gray-200">Date</th>
+                      <th className="py-2 px-4 border-b border-gray-200">Date & Time</th>
                       <th className="py-2 px-4 border-b border-gray-200">Pick Up Location</th>
                       <th className="py-2 px-4 border-b border-gray-200">Drop Off Location</th>
                       <th className="py-2 px-4 border-b border-gray-200">Fare</th>
@@ -127,23 +135,33 @@ export const BookingHistory = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredHistory.map((booking, index) => (
-                      <tr key={index}>
-                        <td className="py-2 px-4 border-b border-gray-200">
-                          {booking.user ? `${booking.user.first_name} ${booking.user.last_name}` : 'N/A'}
-                        </td>
-                        <td className="py-2 px-4 border-b border-gray-200">
-                          {booking.rider ? `${booking.rider.first_name} ${booking.rider.last_name}` : 'N/A'}
-                        </td>
-                        <td className="py-2 px-4 border-b border-gray-200">
-                          {new Date(booking.ride_date).toLocaleDateString()}
-                        </td>
-                        <td className="py-2 px-4 border-b border-gray-200">{booking.pickup_location}</td>
-                        <td className="py-2 px-4 border-b border-gray-200">{booking.dropoff_location}</td>
-                        <td className="py-2 px-4 border-b border-gray-200">{booking.fare}</td>
-                        <td className="py-2 px-4 border-b border-gray-200">{booking.status}</td>
-                      </tr>
-                    ))}
+                    {filteredHistory.map((booking, index) => {
+                      const rideDate = new Date(booking.ride_date);
+                      const formattedDate = rideDate.toLocaleDateString();
+                      const formattedTime = rideDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                      const rideDateTime = `${formattedDate} ${formattedTime}`;
+
+                      return (
+                        <tr key={index}>
+                          <td className="py-2 px-4 border-b border-gray-200">
+                            {booking.ride_id || 'N/A'} {/* Add Ride ID here */}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-200">
+                            {booking.user ? `${booking.user.first_name} ${booking.user.last_name}` : 'N/A'}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-200">
+                            {booking.rider ? `${booking.rider.first_name} ${booking.rider.last_name}` : 'N/A'}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-200">
+                            {rideDateTime}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-200">{booking.pickup_location}</td>
+                          <td className="py-2 px-4 border-b border-gray-200">{booking.dropoff_location}</td>
+                          <td className="py-2 px-4 border-b border-gray-200">{booking.fare}</td>
+                          <td className="py-2 px-4 border-b border-gray-200">{booking.status}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}

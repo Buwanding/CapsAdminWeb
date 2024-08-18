@@ -25,6 +25,10 @@ const RidersList = () => {
     fetchRiders();
   }, []);
 
+  useEffect(() => {
+    setFilteredRiders(riders);
+  }, [riders]);
+
   const handleSelectRider = (riderId) => {
     setSelectedRiders((prevSelectedRiders) => {
       if (prevSelectedRiders.includes(riderId)) {
@@ -100,6 +104,12 @@ const RidersList = () => {
     setFilteredRiders(filtered);
   };
 
+  const clearSearchAndFilter = () => {
+    setSearchInput("");
+    setFilteredRiders(riders);
+  };
+
+
   return (
     <div className="flex">
       <Sidenav />
@@ -123,6 +133,12 @@ const RidersList = () => {
                 >
                   Filter
                 </button>
+                <button
+                      className="px-4 py-2 bg-gray-200 rounded-lg"
+                      onClick={() => clearSearchAndFilter()}
+                    >
+                      Clear
+                    </button>
               </div>
             </div>
             <table className="w-full text-left table-auto">

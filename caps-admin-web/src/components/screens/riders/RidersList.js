@@ -10,6 +10,8 @@ const RidersList = () => {
   const [loadingDisable, setLoadingDisable] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredRiders, setFilteredRiders] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalInfo, setModalInfo] = useState(null);
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -109,6 +111,16 @@ const RidersList = () => {
     setFilteredRiders(riders);
   };
 
+  const openModal = (riderId) => {
+    const riderInfo = riders.find((rider) => rider.user_id === riderId);
+    setModalInfo(riderInfo);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalInfo(null);
+  };
 
   return (
     <div className="flex">
@@ -134,11 +146,11 @@ const RidersList = () => {
                   Filter
                 </button>
                 <button
-                      className="px-4 py-2 bg-gray-200 rounded-lg"
-                      onClick={() => clearSearchAndFilter()}
-                    >
-                      Clear
-                    </button>
+                  className="px-4 py-2 bg-gray-200 rounded-lg"
+                  onClick={clearSearchAndFilter}
+                >
+                  Clear
+                </button>
               </div>
             </div>
             <table className="w-full text-left table-auto">
@@ -163,7 +175,9 @@ const RidersList = () => {
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Phone Number</th>
                   <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Verification</th>
+                  <th className="px-4 py-2">License Expiration</th>
+                  <th className="px-4 py-2">OR Expiration</th>
+                  <th className="px-4 py-2">More</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,17 +208,18 @@ const RidersList = () => {
                       )}
                     </td>
                     <td className="px-4 py-2">
-                      {rider.rider?.verification_status === "Verified" ? (
-                        <span className="inline-flex items-center">
-                          <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                          <span>Verified</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center">
-                          <span className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-                          <span>Pending</span>
-                        </span>
-                      )}
+                      {rider.license_expiration}
+                    </td>
+                    <td className="px-4 py-2">
+                      {rider.or_expiration}
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-700"
+                        onClick={() => openModal(rider.user_id)}
+                      >
+                        Info
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -241,6 +256,48 @@ const RidersList = () => {
           </div>
         </main>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg w-1/2">
+            <h2 className="text-xl font-bold mb-4">Rider Information</h2>
+            {modalInfo && (
+              <>
+                <p>
+                  <strong>Name:</strong> {modalInfo.first_name}{" "}
+                  {modalInfo.last_name}
+                </p>
+                <p>
+                  <strong>Phone Number:</strong> {modalInfo.mobile_number}
+                </p>
+                <p>
+                  <strong>Status:</strong> {modalInfo.status}
+                </p>
+                <p>
+                  <strong>License Expiration:</strong>{" "}
+                  {modalInfo.license_expiration}
+                </p>
+                <p>
+                  <strong>OR Expiration:</strong> {modalInfo.or_expiration}
+                </p>
+                <p>
+                  <strong>Email:</strong> {modalInfo.email}
+                </p>
+                <p>
+                  <strong>OR Expiration:</strong> {modalInfo.date_of_birth}
+                </p>
+              </>
+            )}
+            <button
+              className="mt-4 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

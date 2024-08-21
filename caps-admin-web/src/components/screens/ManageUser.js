@@ -4,33 +4,16 @@ import Header from "../parts/Header";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import userService from "../../services";
 
-const UserCard = ({ customer }) => {
-  const [loading, setLoading] = useState(false);
-
-  const handleStatusChange = async () => {
-    try {
-      setLoading(true); // Set loading state to true
-      const newStatus = customer.status === "Active" ? "Disabled" : "Active";
-      await userService.updateUserStatus(customer.user_id, newStatus);
-      customer.status = newStatus;
-      setLoading(false); // Set loading state to false
-    } catch (error) {
-      console.error(`Error updating user status for user ${customer.user_id}:`, error);
-      setLoading(false); // Set loading state to false
-    }
-  };
-
-  
-
+const UserCard = ({ customer, handleStatusChange, loading }) => {
   return (
     <tr key={customer.user_id}>
       <td className="py-2 px-4 border-b border-gray-200">
         {customer.first_name} {customer.last_name}
       </td>
-      <td className="py-2 px-4 border-b border-gray-200 flex justify-between">
+      <td className="py-2 px-4 border-b border-gray-200 flex justify-between items-center">
         <button
           className={`${customer.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white px-4 py-2 rounded flex items-center justify-center`}
-          onClick={handleStatusChange}
+          onClick={() => handleStatusChange(customer)}
           disabled={loading}
         >
           {loading ? (
@@ -75,6 +58,9 @@ export const ManageUser = () => {
   const [customers, setCustomers] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage] = useState(6);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -92,15 +78,47 @@ export const ManageUser = () => {
 
   const handleFilter = () => {
     const filtered = customers.filter((customer) =>
-    `${customer.first_name} ${customer.last_name}`
+      `${customer.first_name} ${customer.last_name}`
         .toLowerCase()
         .includes(searchInput.toLowerCase())
     );
     setFilteredCustomers(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
+  const handleStatusChange = async (customer) => {
+    try {
+      setLoading(true);
+      const newStatus = customer.status === "Active" ? "Disabled" : "Active";
+      await userService.updateUserStatus(customer.user_id, newStatus);
+      customer.status = newStatus;
+      setFilteredCustomers([...filteredCustomers]);
+      setLoading(false);
+    } catch (error) {
+      console.error(`Error updating user status for user ${customer.user_id}:`, error);
+      setLoading(false);
+    }
+  };
+
+  // Pagination Logic
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+
+  // Change Page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calculate Total Pages
+  const totalPages = Math.ceil(filteredCustomers.length / customersPerPage);
+
+  // Generate Page Numbers
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
   return (
-    <div className="flex">
+    <div className="flex overflow-hidden">
       <Sidenav />
       <div className="flex flex-col w-full">
         <Header />
@@ -137,11 +155,48 @@ export const ManageUser = () => {
                   </tr>
                 </thead>
                 <tbody>
-                {filteredCustomers.map((customer) => (
-                    <UserCard key={customer.user_id} customer={customer} />
+                  {currentCustomers.map((customer) => (
+                    <UserCard
+                      key={customer.user_id}
+                      customer={customer}
+                      handleStatusChange={handleStatusChange}
+                      loading={loading}
+                    />
                   ))}
                 </tbody>
               </table>
+              <div className="flex flex-col items-center mt-4 p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                  >
+                    Previous
+                  </button>
+                  <div className="flex gap-2">
+                    {pageNumbers.map((number) => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                      >
+                        {number}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                  >
+                    Next
+                  </button>
+                </div>
+                <span className="flex items-center">
+                  Page {currentPage} of {totalPages}
+                </span>
+              </div>
             </div>
           </div>
         </main>

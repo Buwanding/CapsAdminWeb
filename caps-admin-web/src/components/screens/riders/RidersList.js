@@ -12,6 +12,8 @@ const RidersList = () => {
   const [filteredRiders, setFilteredRiders] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalInfo, setModalInfo] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -30,6 +32,41 @@ const RidersList = () => {
   useEffect(() => {
     setFilteredRiders(riders);
   }, [riders]);
+
+  // Filter riders based on search input
+  const handleFilter = () => {
+    const filtered = riders.filter((rider) =>
+      `${rider.first_name} ${rider.last_name}`
+        .toLowerCase()
+        .includes(searchInput.toLowerCase())
+    );
+    setFilteredRiders(filtered);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  // Clear search input and reset filter
+  const clearSearchAndFilter = () => {
+    setSearchInput("");
+    setFilteredRiders(riders);
+    setCurrentPage(1); // Reset to first page
+  };
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredRiders.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change Page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calculate Total Pages
+  const totalPages = Math.ceil(filteredRiders.length / itemsPerPage);
+
+  // Generate Page Numbers
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
 
   const handleSelectRider = (riderId) => {
     setSelectedRiders((prevSelectedRiders) => {
@@ -96,20 +133,6 @@ const RidersList = () => {
     const rider = riders.find((r) => r.user_id === riderId);
     return rider?.status === "Disabled";
   });
-
-  const handleFilter = () => {
-    const filtered = riders.filter((rider) =>
-      `${rider.first_name} ${rider.last_name}`
-        .toLowerCase()
-        .includes(searchInput.toLowerCase())
-    );
-    setFilteredRiders(filtered);
-  };
-
-  const clearSearchAndFilter = () => {
-    setSearchInput("");
-    setFilteredRiders(riders);
-  };
 
   const openModal = (riderId) => {
     const riderInfo = riders.find((rider) => rider.user_id === riderId);
@@ -181,7 +204,7 @@ const RidersList = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredRiders.map((rider) => (
+                {currentItems.map((rider) => (
                   <tr key={rider.user_id} className="border-t">
                     <td className="px-4 py-2">
                       <input
@@ -225,6 +248,36 @@ const RidersList = () => {
                 ))}
               </tbody>
             </table>
+            <div className="mt-6 flex flex-col items-center">
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="bg-gray-300 px-4 py-2 rounded"
+                >
+                  Previous
+                </button>
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="bg-gray-300 px-4 py-2 rounded"
+                >
+                  Next
+                </button>
+              </div>
+              <span className="text-center">
+                Page {currentPage} of {totalPages}
+              </span>
+            </div>
             <div className="mt-6 flex items-center space-x-4">
               <button
                 className={`${
@@ -285,7 +338,7 @@ const RidersList = () => {
                   <strong>Email:</strong> {modalInfo.email}
                 </p>
                 <p>
-                  <strong>OR Expiration:</strong> {modalInfo.date_of_birth}
+                  <strong>Date of Birth:</strong> {modalInfo.date_of_birth}
                 </p>
               </>
             )}

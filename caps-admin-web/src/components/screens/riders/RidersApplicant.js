@@ -4,6 +4,7 @@ import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 
 const users = [
+  // Add more users if needed
   {
     name: "Sonny Ali",
     username: "SonnyAli",
@@ -34,6 +35,7 @@ const users = [
       "Motor Picture with Plate Number",
     ],
   },
+  // Add more users if needed
 ];
 
 const UserCard = ({ user }) => {
@@ -78,6 +80,26 @@ const UserCard = ({ user }) => {
 };
 
 export const RidersApplicant = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); // Number of items per page
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change Page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Calculate Total Pages
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  // Generate Page Numbers
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
   return (
     <div className="flex">
       <Sidenav />
@@ -87,11 +109,42 @@ export const RidersApplicant = () => {
           <div className="flex">
             <div className="flex-1">
               <div className="p-4">
-                {users.map((user, index) => (
+                {currentUsers.map((user, index) => (
                   <UserCard key={index} user={user} />
                 ))}
               </div>
             </div>
+          </div>
+          {/* Pagination Controls */}
+          <div className="mt-6 flex flex-col items-center">
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Previous
+              </button>
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                >
+                  {number}
+                </button>
+              ))}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Next
+              </button>
+            </div>
+            <span className="text-center">
+              Page {currentPage} of {totalPages}
+            </span>
           </div>
         </main>
       </div>

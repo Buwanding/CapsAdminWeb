@@ -162,7 +162,7 @@ export const ManageUser = () => {
                       handleStatusChange={handleStatusChange}
                       loading={loading}
                     />
-                  ))}
+                  ))} 
                 </tbody>
               </table>
               <div className="flex flex-col items-center mt-4 p-4">

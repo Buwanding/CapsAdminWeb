@@ -1,57 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/solid";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
+import userService from "../../../services";
 
-const users = [
-  // Add more users if needed
-  {
-    name: "Sonny Ali",
-    username: "SonnyAli",
-    avatar: "path_to_avatar", // Replace with actual path
-    documents: [
-      "Motor Picture",
-      "ROCR",
-      "Certificate of Registration",
-      "Driver License",
-      "TPL Insurance",
-      "Barangay Clearance",
-      "Police Clearance",
-      "Motor Picture with Plate Number",
-    ],
-  },
-  {
-    name: "Tracy Moreno",
-    username: "TracyMoreno",
-    avatar: "path_to_avatar", // Replace with actual path
-    documents: [
-      "Motor Picture",
-      "ROCR",
-      "Certificate of Registration",
-      "Driver License",
-      "TPL Insurance",
-      "Barangay Clearance",
-      "Police Clearance",
-      "Motor Picture with Plate Number",
-    ],
-  },
-  // Add more users if needed
-];
-
-const UserCard = ({ user }) => {
+// Define a UserCard component to display individual user information
+const UserCard = ({ rider }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const { user, requirement_photos: documents } = rider; // Extract user and requirement_photos from the rider object
 
   return (
-    <div className="border p-4 rounded-lg shadow-sm bg-white mb-4">
-      <div className="flex items-center mb-4">
+    <div className="border p-3 rounded-lg shadow-sm bg-white mb-2">
+      <div className="flex items-center mb-2">
+        {/* If you don't have avatars, provide a placeholder */}
         <img
-          src={user.avatar}
+          src={user.avatar || "placeholder-image-url"} // Replace "placeholder-image-url" with the actual path if needed
           alt="Avatar"
           className="h-12 w-12 rounded-full"
         />
-        <div className="ml-4">
-          <p className="font-bold">{user.name}</p>
-          <p className="text-gray-600">@{user.username}</p>
+        <div className="ml-8">
+          <p className="font-semibold text-sm">{user.first_name} {user.last_name}</p>
+          <p className="text-gray-600 text-xs">@{user.user_name}</p>
+          <p className="text-xs"><span className={`${rider.verification_status === "Verified" ? "text-green-600" : "text-yellow-600"}`}>{rider.verification_status}</span></p>
         </div>
         <div className="ml-auto">
           <button
@@ -68,31 +38,53 @@ const UserCard = ({ user }) => {
       </div>
       {!isCollapsed && (
         <div className="grid grid-cols-3 gap-4">
-          {user.documents.map((doc, index) => (
-            <div key={index} className="bg-gray-300 p-4 rounded text-center">
-              {doc}
-            </div>
-          ))}
+          {/* Ensure each document is displayed correctly */}
+          {documents.length > 0 ? (
+            documents.map((doc, index) => (
+              <div key={index} className="bg-gray-300 p-4 rounded text-center">
+                <img src={doc.photo_url} alt={`Document ${index + 1}`} />
+              </div>
+            ))
+          ) : (
+            <p>No documents available</p>
+          )}
         </div>
       )}
     </div>
   );
 };
 
+// Main component
 export const RidersApplicant = () => {
+  const [riders, setRiders] = useState([]); // State to store the fetched riders
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5); // Number of items per page
+
+  // Fetch users with "Rider" role from the API
+  useEffect(() => {
+    const fetchRiders = async () => {
+      try {
+        const data = await userService.fetchRequirements();
+        setRiders(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching riders:", error);
+      }
+    };
+
+    fetchRiders();
+  }, []);
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+  const currentRiders = riders.slice(indexOfFirstItem, indexOfLastItem);
 
   // Change Page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Calculate Total Pages
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const totalPages = Math.ceil(riders.length / itemsPerPage);
 
   // Generate Page Numbers
   const pageNumbers = [];
@@ -109,8 +101,8 @@ export const RidersApplicant = () => {
           <div className="flex">
             <div className="flex-1">
               <div className="p-4">
-                {currentUsers.map((user, index) => (
-                  <UserCard key={index} user={user} />
+                {currentRiders.map((rider, index) => (
+                  <UserCard key={index} rider={rider} />
                 ))}
               </div>
             </div>

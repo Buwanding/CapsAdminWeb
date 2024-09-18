@@ -17,6 +17,10 @@ import { RidersApplicant } from "./components/screens/riders/RidersApplicant";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
+
 
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
@@ -81,15 +85,19 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AxiosInterceptor>
-          <div className="App">
-            <AppContent />
-          </div>
-        </AxiosInterceptor>
-      </Router>
-    </AuthProvider>
+    <>
+      <ToastContainer />
+        <AuthProvider>
+          <ToastContainer />
+          <Router>
+            <AxiosInterceptor>
+              <div className="App">
+                <AppContent />
+              </div>
+            </AxiosInterceptor>
+          </Router>
+        </AuthProvider>
+    </>
   );
 }
 

@@ -25,7 +25,9 @@ const UserCard = ({ admin, onStatusChange, onEdit }) => {
       <img src="" alt="Avatar" className="h-12 w-12 rounded-full" />
       <div className="ml-4 flex-1">
         <p className="font-bold">{admin.first_name} {admin.last_name}</p>
-        <p className="text-gray-400 font-bold">
+        <p className="text-gray-500 font-bold">{admin.email}</p>
+        <p className="text-gray-500 font-bold">{admin.mobile_number}</p>
+        <p className="text-gray-500 font-bold">
           Status: <span className={`${admin.status === "Active" ? "text-green-600" : "text-red-600"}`}>
             {admin.status}
           </span>
@@ -33,17 +35,17 @@ const UserCard = ({ admin, onStatusChange, onEdit }) => {
       </div>
       <div className="flex flex-col items-center">
         <button
-          className="bg-yellow-500 text-white py-1 px-5 rounded mb-2 flex items-center justify-center"
-          onClick={() => onEdit(admin.user_id)}
-        >
-          Edit
-        </button>
-        <button
-          className={`${admin.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white py-1 px-2 rounded flex items-center justify-center`}
+          className={`${admin.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white py-1 px-2 rounded mb-2 flex items-center justify-center`}
           onClick={handleStatusChange}
           disabled={loading}
         >
           {loading ? "Loading..." : (admin.status === "Active" ? "Disable" : "Enable")}
+        </button>
+        <button
+          className="bg-yellow-500 text-white py-1 px-5 rounded flex items-center justify-center"
+          onClick={() => onEdit(admin.user_id)}
+        >
+          Edit
         </button>
       </div>
     </div>
@@ -54,6 +56,14 @@ const ManageAdmin = () => {
   const [showForm, setShowForm] = useState(false);
   const [admin, setAdmin] = useState([]);
   const [editingAdminId, setEditingAdminId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const handleSuccess = (message) => {
+    
+    setSuccessMessage(message);
+    fetchAdmins(); // Refresh the admin list
+  };
+  
 
   useEffect(() => {
     const fetchAdmin = async () => {
@@ -68,6 +78,15 @@ const ManageAdmin = () => {
     fetchAdmin();
   }, []);
 
+  const fetchAdmins = async () => {
+    try {
+      const adminList = await userService.fetchAdmin();
+      setAdmin(adminList);
+    } catch (error) {
+      console.error("Error fetching admins:", error);
+    }
+  };
+
   const handleStatusChange = (userId, newStatus) => {
     setAdmin((prevAdmin) =>
       prevAdmin.map((admin) =>
@@ -78,6 +97,7 @@ const ManageAdmin = () => {
 
   const handleEdit = (userId) => {
     setEditingAdminId(userId);
+    console.log("ID PINAKAUNA: " + editingAdminId);
     setShowForm(true);
   };
 
@@ -109,11 +129,13 @@ const ManageAdmin = () => {
               </header>
 
               <div className="p-4">
-                {showForm && (
+              {showForm && (
                   <AddAdminForm
                     setShowForm={setShowForm}
                     setAdmin={setAdmin}
                     editingAdminId={editingAdminId}
+                    editingAdmin={admin.find(a => a.user_id === editingAdminId)}
+                    onSuccess={handleSuccess}
                   />
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -131,6 +153,11 @@ const ManageAdmin = () => {
           </div>
         </main>
       </div>
+      {successMessage && (
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
+        {successMessage}
+      </div>
+    )}
     </div>
   );
 };

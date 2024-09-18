@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/solid";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 
+// Sample data for users
 const users = [
-  // Add more users if needed
   {
     name: "Sonny Ali",
     username: "SonnyAli",
@@ -35,12 +34,9 @@ const users = [
       "Motor Picture with Plate Number",
     ],
   },
-  // Add more users if needed
 ];
 
-const UserCard = ({ user }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
+const UserCard = ({ user, onMoreInfo }) => {
   return (
     <div className="border p-4 rounded-lg shadow-sm bg-white mb-4">
       <div className="flex items-center mb-4">
@@ -55,26 +51,52 @@ const UserCard = ({ user }) => {
         </div>
         <div className="ml-auto">
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-gray-500"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent click event from bubbling up
+              onMoreInfo(user); // Trigger the onMoreInfo callback
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
           >
-            {isCollapsed ? (
-              <ChevronDownIcon className="w-6 h-6" />
-            ) : (
-              <ChevronUpIcon className="w-6 h-6" />
-            )}
+            More Info
           </button>
         </div>
       </div>
-      {!isCollapsed && (
-        <div className="grid grid-cols-3 gap-4">
-          {user.documents.map((doc, index) => (
-            <div key={index} className="bg-gray-300 p-4 rounded text-center">
-              {doc}
-            </div>
-          ))}
+    </div>
+  );
+};
+
+
+const Modal = ({ user, onClose }) => {
+  if (!user) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-xl font-bold mb-4">User Details</h2>
+        <img
+          src={user.avatar}
+          alt="Avatar"
+          className="h-24 w-24 rounded-full mx-auto mb-4"
+        />
+        <p className="text-center text-lg font-bold">{user.name}</p>
+        <p className="text-center text-gray-600">@{user.username}</p>
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold mb-2">Documents</h3>
+          <ul>
+            {user.documents.map((doc, index) => (
+              <li key={index} className="bg-gray-200 p-2 rounded mb-2">
+                {doc}
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
+        <button
+          onClick={onClose}
+          className="mt-4 bg-gray-300 px-4 py-2 rounded"
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 };
@@ -82,6 +104,7 @@ const UserCard = ({ user }) => {
 export const RidersApplicant = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5); // Number of items per page
+  const [selectedUser, setSelectedUser] = useState(null); // State for selected user
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -101,53 +124,56 @@ export const RidersApplicant = () => {
   }
 
   return (
-    <div className="flex">
-      <Sidenav />
-      <div className="flex flex-col w-full">
-        <Header />
-        <main className="flex-grow p-4 bg-gray-100">
-          <div className="flex">
-            <div className="flex-1">
-              <div className="p-4">
-                {currentUsers.map((user, index) => (
-                  <UserCard key={index} user={user} />
-                ))}
-              </div>
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow">
+        <Sidenav />
+        <div className="flex flex-col w-full">
+          <Header />
+          <main className="flex-grow p-4 bg-gray-100">
+            <div className="p-4">
+              {currentUsers.map((user, index) => (
+                <UserCard
+                  key={index}
+                  user={user}
+                  onMoreInfo={(user) => setSelectedUser(user)}
+                />
+              ))}
             </div>
-          </div>
-          {/* Pagination Controls */}
-          <div className="mt-6 flex flex-col items-center">
-            <div className="flex gap-2 mb-4">
+          </main>
+          {/* Footer with Pagination */}
+          <footer className="bg-white p-4 shadow-md">
+            <div className="flex justify-between items-center">
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className={`bg-gray-300 px-4 py-2 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
               >
                 Previous
               </button>
-              {pageNumbers.map((number) => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                >
-                  {number}
-                </button>
-              ))}
+              <div className="flex gap-2">
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className={`bg-gray-300 px-4 py-2 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
               >
                 Next
               </button>
             </div>
-            <span className="text-center">
-              Page {currentPage} of {totalPages}
-            </span>
-          </div>
-        </main>
+          </footer>
+        </div>
       </div>
+      {/* Modal for User Details */}
+      <Modal user={selectedUser} onClose={() => setSelectedUser(null)} />
     </div>
   );
 };

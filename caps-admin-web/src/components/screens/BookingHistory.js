@@ -10,7 +10,7 @@ export const BookingHistory = () => {
   const [riderSearch, setRiderSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(9);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -75,7 +75,7 @@ export const BookingHistory = () => {
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidenav />
       <div className="flex flex-col w-full">
         <Header />
@@ -164,7 +164,7 @@ export const BookingHistory = () => {
                         return (
                           <tr key={index}>
                             <td className="py-2 px-4 border-b border-gray-200">
-                              {booking.ride_id || 'N/A'} {/* Add Ride ID here */}
+                              {booking.ride_id || 'N/A'}
                             </td>
                             <td className="py-2 px-4 border-b border-gray-200">
                               {booking.user ? `${booking.user.first_name} ${booking.user.last_name}` : 'N/A'}
@@ -184,42 +184,41 @@ export const BookingHistory = () => {
                       })}
                     </tbody>
                   </table>
-                  {/* Pagination Controls */}
-                  <div className="flex flex-col items-center mt-4 p-4">
-                    <div className="flex gap-2 mb-4">
-                      <button
-                        onClick={() => paginate(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="bg-gray-300 px-4 py-2 rounded"
-                      >
-                        Previous
-                      </button>
-                      {pageNumbers.map((number) => (
-                        <button
-                          key={number}
-                          onClick={() => paginate(number)}
-                          className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                        >
-                          {number}
-                        </button>
-                      ))}
-                      <button
-                        onClick={() => paginate(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="bg-gray-300 px-4 py-2 rounded"
-                      >
-                        Next
-                      </button>
-                    </div>
-                    <span className="flex items-center">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                  </div>
                 </>
               )}
             </div>
           </div>
         </main>
+        {/* Footer for Pagination */}
+        <footer className="bg-white shadow p-4 flex-shrink-0">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200'}`}
+            >
+              Previous
+            </button>
+            <div className="flex gap-2">
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                >
+                  {number}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200'}`}
+            >
+              Next
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );

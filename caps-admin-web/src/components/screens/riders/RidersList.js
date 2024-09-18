@@ -146,117 +146,149 @@ const RidersList = () => {
   };
 
   return (
-    <div className="flex">
-      <Sidenav />
-      <div className="flex flex-col w-full">
-        <Header />
-        <main className="flex-grow p-4 bg-gray-100">
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-2xl font-bold">RIDERS LIST</h1>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Search Names"
-                  className="px-4 py-2 border rounded-lg"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow">
+        <Sidenav />
+        <div className="flex flex-col w-full">
+          <Header />
+          <main className="flex-grow p-4 bg-gray-100">
+            <div className="bg-white shadow-md rounded-lg p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">RIDERS LIST</h1>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search Names"
+                    className="px-4 py-2 border rounded-lg"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <button
+                    className="px-4 py-2 border rounded-lg"
+                    onClick={handleFilter}
+                  >
+                    Filter
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-gray-200 rounded-lg"
+                    onClick={clearSearchAndFilter}
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+              <table className="w-full text-left table-auto">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedRiders(riders.map((rider) => rider.user_id));
+                          } else {
+                            setSelectedRiders([]);
+                          }
+                        }}
+                        checked={
+                          selectedRiders.length === riders.length &&
+                          riders.length > 0
+                        }
+                      />
+                    </th>
+                    <th className="px-4 py-2">Name</th>
+                    <th className="px-4 py-2">Phone Number</th>
+                    <th className="px-4 py-2">Status</th>
+                    <th className="px-4 py-2">License Expiration</th>
+                    <th className="px-4 py-2">OR Expiration</th>
+                    <th className="px-4 py-2">More</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((rider) => (
+                    <tr key={rider.user_id} className="border-t">
+                      <td className="px-4 py-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedRiders.includes(rider.user_id)}
+                          onChange={() => handleSelectRider(rider.user_id)}
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        {rider.first_name} {rider.last_name}
+                      </td>
+                      <td className="px-4 py-2">{rider.mobile_number}</td>
+                      <td className="px-4 py-2">
+                        {rider.status === "Active" ? (
+                          <span className="inline-flex items-center">
+                            <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                            <span>{rider.status}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center">
+                            <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                            <span>{rider.status}</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        {rider.license_expiration}
+                      </td>
+                      <td className="px-4 py-2">
+                        {rider.or_expiration}
+                      </td>
+                      <td className="px-4 py-2">
+                        <button
+                          className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-700"
+                          onClick={() => openModal(rider.user_id)}
+                        >
+                          Info
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="mt-6 flex items-center space-x-4">
                 <button
-                  className="px-4 py-2 border rounded-lg"
-                  onClick={handleFilter}
+                  className={`${
+                    loadingDisable
+                      ? "bg-red-700"
+                      : isAnySelectedDisabled
+                      ? "bg-red-300"
+                      : "bg-red-500 hover:bg-red-700"
+                  } text-white font-bold py-2 px-4 rounded-full`}
+                  onClick={handleDisableRiders}
+                  disabled={isAnySelectedDisabled || loadingDisable}
                 >
-                  Filter
+                  {loadingDisable ? "Disabling..." : "Disable"}
                 </button>
                 <button
-                  className="px-4 py-2 bg-gray-200 rounded-lg"
-                  onClick={clearSearchAndFilter}
+                  className={`${
+                    loadingActivate
+                      ? "bg-green-700"
+                      : isAnySelectedActive
+                      ? "bg-green-300"
+                      : "bg-green-500 hover:bg-green-700"
+                  } text-white font-bold py-2 px-4 rounded-full`}
+                  onClick={handleActivateRiders}
+                  disabled={isAnySelectedActive || loadingActivate}
                 >
-                  Clear
+                  {loadingActivate ? "Activating..." : "Activate Rider"}
                 </button>
               </div>
             </div>
-            <table className="w-full text-left table-auto">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedRiders(riders.map((rider) => rider.user_id));
-                        } else {
-                          setSelectedRiders([]);
-                        }
-                      }}
-                      checked={
-                        selectedRiders.length === riders.length &&
-                        riders.length > 0
-                      }
-                    />
-                  </th>
-                  <th className="px-4 py-2">Name</th>
-                  <th className="px-4 py-2">Phone Number</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">License Expiration</th>
-                  <th className="px-4 py-2">OR Expiration</th>
-                  <th className="px-4 py-2">More</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((rider) => (
-                  <tr key={rider.user_id} className="border-t">
-                    <td className="px-4 py-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedRiders.includes(rider.user_id)}
-                        onChange={() => handleSelectRider(rider.user_id)}
-                      />
-                    </td>
-                    <td className="px-4 py-2">
-                      {rider.first_name} {rider.last_name}
-                    </td>
-                    <td className="px-4 py-2">{rider.mobile_number}</td>
-                    <td className="px-4 py-2">
-                      {rider.status === "Active" ? (
-                        <span className="inline-flex items-center">
-                          <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                          <span>{rider.status}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center">
-                          <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                          <span>{rider.status}</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      {rider.license_expiration}
-                    </td>
-                    <td className="px-4 py-2">
-                      {rider.or_expiration}
-                    </td>
-                    <td className="px-4 py-2">
-                      <button
-                        className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-700"
-                        onClick={() => openModal(rider.user_id)}
-                      >
-                        Info
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="mt-6 flex flex-col items-center">
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="bg-gray-300 px-4 py-2 rounded"
-                >
-                  Previous
-                </button>
+          </main>
+          <footer className="bg-white p-4 shadow-md">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
                 {pageNumbers.map((number) => (
                   <button
                     key={number}
@@ -266,48 +298,17 @@ const RidersList = () => {
                     {number}
                   </button>
                 ))}
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="bg-gray-300 px-4 py-2 rounded"
-                >
-                  Next
-                </button>
               </div>
-              <span className="text-center">
-                Page {currentPage} of {totalPages}
-              </span>
-            </div>
-            <div className="mt-6 flex items-center space-x-4">
               <button
-                className={`${
-                  loadingDisable
-                    ? "bg-red-700"
-                    : isAnySelectedDisabled
-                    ? "bg-red-300"
-                    : "bg-red-500 hover:bg-red-700"
-                } text-white font-bold py-2 px-4 rounded-full`}
-                onClick={handleDisableRiders}
-                disabled={isAnySelectedDisabled || loadingDisable}
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="bg-gray-300 px-4 py-2 rounded"
               >
-                {loadingDisable ? "Disabling..." : "Disable"}
-              </button>
-              <button
-                className={`${
-                  loadingActivate
-                    ? "bg-green-700"
-                    : isAnySelectedActive
-                    ? "bg-green-300"
-                    : "bg-green-500 hover:bg-green-700"
-                } text-white font-bold py-2 px-4 rounded-full`}
-                onClick={handleActivateRiders}
-                disabled={isAnySelectedActive || loadingActivate}
-              >
-                {loadingActivate ? "Activating..." : "Activate Rider"}
+                Next
               </button>
             </div>
-          </div>
-        </main>
+          </footer>
+        </div>
       </div>
 
       {/* Modal */}

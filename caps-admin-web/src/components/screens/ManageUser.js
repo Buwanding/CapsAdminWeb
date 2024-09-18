@@ -37,12 +37,16 @@ const UserCard = ({ customer, handleStatusChange, loading }) => {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
+          ) : customer.status === "Active" ? (
+            "Disable"
           ) : (
-            customer.status === "Active" ? "Disable" : "Enable"
+            "Enable"
           )}
         </button>
         <span
-          className={`px-4 py-2 rounded ${customer.status === "Active" ? "text-green-600" : "text-red-600"} text-gray-400 font-bold`}
+          className={`px-4 py-2 rounded ${
+            customer.status === "Active" ? "text-green-600" : "text-red-600"
+          } text-gray-400 font-bold`}
         >
           {customer.status}
         </span>
@@ -95,7 +99,10 @@ export const ManageUser = () => {
       setFilteredCustomers([...filteredCustomers]);
       setLoading(false);
     } catch (error) {
-      console.error(`Error updating user status for user ${customer.user_id}:`, error);
+      console.error(
+        `Error updating user status for user ${customer.user_id}:`,
+        error
+      );
       setLoading(false);
     }
   };
@@ -103,7 +110,10 @@ export const ManageUser = () => {
   // Pagination Logic
   const indexOfLastCustomer = currentPage * customersPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const currentCustomers = filteredCustomers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
 
   // Change Page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -119,9 +129,9 @@ export const ManageUser = () => {
 
   return (
     <div className="flex overflow-hidden">
-      <Sidenav />
+      <Sidenav className="fixed" />
       <div className="flex flex-col w-full">
-        <Header />
+        <Header className="fixed" />
         <main className="flex-grow p-4 bg-gray-100">
           <div className="p-4">
             <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -135,7 +145,7 @@ export const ManageUser = () => {
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  <button 
+                  <button
                     className="bg-gray-300 px-4 py-2 rounded-r"
                     onClick={handleFilter}
                   >
@@ -165,41 +175,48 @@ export const ManageUser = () => {
                   ))}
                 </tbody>
               </table>
-              <div className="flex flex-col items-center mt-4 p-4">
-                <div className="flex justify-between items-center mb-4">
-                  <button
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="bg-gray-300 px-4 py-2 rounded"
-                  >
-                    Previous
-                  </button>
-                  <div className="flex gap-2">
-                    {pageNumbers.map((number) => (
-                      <button
-                        key={number}
-                        onClick={() => paginate(number)}
-                        className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                      >
-                        {number}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="bg-gray-300 px-4 py-2 rounded"
-                  >
-                    Next
-                  </button>
-                </div>
-                <span className="flex items-center">
-                  Page {currentPage} of {totalPages}
-                </span>
-              </div>
             </div>
           </div>
         </main>
+        <footer className="bg-white shadow p-4 flex-shrink-0">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded ${
+                currentPage === 1 ? "bg-gray-200 cursor-not-allowed" : "bg-gray-300"
+              }`}
+            >
+              Previous
+            </button>
+            <div className="flex gap-2">
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  className={`px-4 py-2 rounded ${
+                    number === currentPage
+                      ? "bg-gray-300 font-bold"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {number}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded ${
+                currentPage === totalPages
+                  ? "bg-gray-200 cursor-not-allowed"
+                  : "bg-gray-300"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );

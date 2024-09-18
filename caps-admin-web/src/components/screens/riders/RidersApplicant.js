@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
+import defaultProfileLogo from "../../pictures/avatar.png"; // Import the default logo
 
 // Sample data for users
 const users = [
   {
     name: "Sonny Ali",
     username: "SonnyAli",
-    avatar: "path_to_avatar", // Replace with actual path
+    avatar: "", // Leave empty to test default logo
     documents: [
       "Motor Picture",
       "ROCR",
@@ -22,7 +23,7 @@ const users = [
   {
     name: "Tracy Moreno",
     username: "TracyMoreno",
-    avatar: "path_to_avatar", // Replace with actual path
+    avatar: "", // Leave empty to test default logo
     documents: [
       "Motor Picture",
       "ROCR",
@@ -41,7 +42,7 @@ const UserCard = ({ user, onMoreInfo }) => {
     <div className="border p-4 rounded-lg shadow-sm bg-white mb-4">
       <div className="flex items-center mb-4">
         <img
-          src={user.avatar}
+          src={user.avatar || defaultProfileLogo}
           alt="Avatar"
           className="h-12 w-12 rounded-full"
         />
@@ -65,21 +66,22 @@ const UserCard = ({ user, onMoreInfo }) => {
   );
 };
 
-
 const Modal = ({ user, onClose }) => {
   if (!user) return null;
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
-        <div className="flex flex-col md:flex-row items-center">
-          <img
-            src={user.avatar}
-            alt="Avatar"
-            className="h-24 w-24 rounded-full mx-auto mb-4 md:mb-0 md:mr-6"
-          />
+        <div className="flex flex-col md:flex-row items-center md:items-start">
+          <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+            <img
+              src={user.avatar || defaultProfileLogo}
+              alt="Avatar"
+              className="h-32 w-32 rounded-full mx-auto" // Increased size
+            />
+          </div>
           <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold mb-2">{user.name}</h2>
+            <h2 className="text-3xl font-bold mb-2">{user.name}</h2> {/* Increased font size */}
             <p className="text-gray-600 text-lg mb-4">@{user.username}</p>
             <h3 className="text-xl font-semibold mb-2">Documents</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,6 +103,7 @@ const Modal = ({ user, onClose }) => {
     </div>
   );
 };
+
 
 
 export const RidersApplicant = () => {

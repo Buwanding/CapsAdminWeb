@@ -71,28 +71,29 @@ const Modal = ({ user, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">User Details</h2>
-        <img
-          src={user.avatar}
-          alt="Avatar"
-          className="h-24 w-24 rounded-full mx-auto mb-4"
-        />
-        <p className="text-center text-lg font-bold">{user.name}</p>
-        <p className="text-center text-gray-600">@{user.username}</p>
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">Documents</h3>
-          <ul>
-            {user.documents.map((doc, index) => (
-              <li key={index} className="bg-gray-200 p-2 rounded mb-2">
-                {doc}
-              </li>
-            ))}
-          </ul>
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
+        <div className="flex flex-col md:flex-row items-center">
+          <img
+            src={user.avatar}
+            alt="Avatar"
+            className="h-24 w-24 rounded-full mx-auto mb-4 md:mb-0 md:mr-6"
+          />
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-bold mb-2">{user.name}</h2>
+            <p className="text-gray-600 text-lg mb-4">@{user.username}</p>
+            <h3 className="text-xl font-semibold mb-2">Documents</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {user.documents.map((doc, index) => (
+                <div key={index} className="bg-gray-200 p-4 rounded text-center">
+                  <p className="text-gray-700">{doc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <button
           onClick={onClose}
-          className="mt-4 bg-gray-300 px-4 py-2 rounded"
+          className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-300 transition-colors"
         >
           Close
         </button>
@@ -100,6 +101,7 @@ const Modal = ({ user, onClose }) => {
     </div>
   );
 };
+
 
 export const RidersApplicant = () => {
   const [currentPage, setCurrentPage] = useState(1);

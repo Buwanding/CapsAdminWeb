@@ -50,99 +50,102 @@ export const Feedback = () => {
   }
 
   return (
-    <div className="flex">
-      <Sidenav />
-      <div className="flex flex-col w-full">
-        <Header />
-        <main className="flex-grow p-4 bg-gray-100">
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">Feedback</h2>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder="Search Names"
-                  className="px-4 py-2 border rounded-lg"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-                <button className="px-4 py-2 bg-gray-200 rounded-lg">
-                  Filter
-                </button>
-              </div>
-            </div>
-            {loading ? (
-              <div className="p-4 text-center">Loading...</div>
-            ) : (
-              <>
-                <table className="w-full bg-gray-100 rounded-lg shadow">
-                  <thead>
-                    <tr className="bg-gray-200">
-                      <th className="p-4 text-left">Sender</th>
-                      <th className="p-4 text-left">Comment</th>
-                      <th className="p-4 text-left">Recipient</th>
-                      <th className="p-4 text-left">Sender Type</th>
-                      <th className="p-4 text-left">Date</th>
-                      <th className="p-4 text-left">Ride ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentItems.map(feedback => (
-                      <tr className="bg-white border-b" key={feedback.feedback_id}>
-                        <td className="p-4">
-                          {feedback.sender_first_name && feedback.sender_last_name
-                            ? `${feedback.sender_first_name} ${feedback.sender_last_name}`
-                            : 'N/A'}
-                        </td>
-                        <td className="p-4">{feedback.comment || 'N/A'}</td>
-                        <td className="p-4">
-                          {feedback.recipient_first_name && feedback.recipient_last_name
-                            ? `${feedback.recipient_first_name} ${feedback.recipient_last_name}`
-                            : 'N/A'}
-                        </td>
-                        <td className="p-4">{feedback.sender_type ? feedback.sender_type.split('\\').pop() : 'N/A'}</td>
-                        <td className="p-4">{feedback.created_at ? new Date(feedback.created_at).toLocaleDateString() : 'N/A'}</td>
-                        <td className="p-4">{feedback.ride_id || 'N/A'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {/* Pagination Controls */}
-                <div className="flex flex-col items-center mt-4 p-4">
-                  <div className="flex gap-2 mb-4">
-                    <button
-                      onClick={() => paginate(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="bg-gray-300 px-4 py-2 rounded"
-                    >
-                      Previous
-                    </button>
-                    {pageNumbers.map((number) => (
-                      <button
-                        key={number}
-                        onClick={() => paginate(number)}
-                        className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                      >
-                        {number}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => paginate(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="bg-gray-300 px-4 py-2 rounded"
-                    >
-                      Next
-                    </button>
-                  </div>
-                  <span className="flex items-center">
-                    Page {currentPage} of {totalPages}
-                  </span>
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow">
+        <Sidenav />
+        <div className="flex flex-col w-full">
+          <Header />
+          <main className="flex-grow p-2 bg-gray-100">
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Feedback</h2>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search Names"
+                    className="px-4 py-2 border rounded-lg"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <button className="px-4 py-2 bg-gray-200 rounded-lg">
+                    Filter
+                  </button>
                 </div>
-              </>
-            )}
-          </div>
-        </main>
+              </div>
+              {loading ? (
+                <div className="p-4 text-center">Loading...</div>
+              ) : (
+                <>
+                  <table className="w-full bg-gray-100 rounded-lg shadow">
+                    <thead>
+                      <tr className="bg-gray-200">
+                        <th className="p-4 text-left">Sender</th>
+                        <th className="p-4 text-left">Comment</th>
+                        <th className="p-4 text-left">Recipient</th>
+                        <th className="p-4 text-left">Sender Type</th>
+                        <th className="p-4 text-left">Date</th>
+                        <th className="p-4 text-left">Ride ID</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentItems.map(feedback => (
+                        <tr className="bg-white border-b" key={feedback.feedback_id}>
+                          <td className="p-4">
+                            {feedback.sender_first_name && feedback.sender_last_name
+                              ? `${feedback.sender_first_name} ${feedback.sender_last_name}`
+                              : 'N/A'}
+                          </td>
+                          <td className="p-4">{feedback.comment || 'N/A'}</td>
+                          <td className="p-4">
+                            {feedback.recipient_first_name && feedback.recipient_last_name
+                              ? `${feedback.recipient_first_name} ${feedback.recipient_last_name}`
+                              : 'N/A'}
+                          </td>
+                          <td className="p-4">{feedback.sender_type ? feedback.sender_type.split('\\').pop() : 'N/A'}</td>
+                          <td className="p-4">{feedback.created_at ? new Date(feedback.created_at).toLocaleDateString() : 'N/A'}</td>
+                          <td className="p-4">{feedback.ride_id || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+            </div>
+          </main>
+          {/* Footer with Pagination */}
+          <footer className="bg-white p-2 shadow-md">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Next
+              </button>
+            </div>
+          </footer>
+        </div>
+        
       </div>
+      
     </div>
   );
 };

@@ -147,7 +147,8 @@ const RidersList = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow">
       <Sidenav />
       <div className="flex flex-col w-full">
         <Header />
@@ -176,7 +177,7 @@ const RidersList = () => {
                   Clear
                 </button>
               </div>
-              </div>
+            </div>
             <table className="w-full text-left table-auto">
               <thead>
                 <tr>
@@ -237,12 +238,11 @@ const RidersList = () => {
                         .filter((photo) => photo.requirement_id === 7)
                         .map((photo, index) => (
                           <>
-                            <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
                             <span key={index}>{photo.photo_url}</span>
                           </>
                         ))
                     ) : (
-                      'No License Photo'
+                      'No License Expiration Date'
                     )}
                     </td>
                     <td>
@@ -253,7 +253,7 @@ const RidersList = () => {
                             <span key={index}>{photo.photo_url}</span>
                           ))
                       ) : (
-                        'No OR Photo'
+                        'No OR Expiration Date'
                       )}
                     </td>
                     <td className="px-4 py-2">
@@ -268,37 +268,7 @@ const RidersList = () => {
                 ))}
               </tbody>
             </table>
-            <div className="mt-6 flex flex-col items-center">
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="bg-gray-300 px-4 py-2 rounded"
-                >
-                  Previous
-                </button>
-                {pageNumbers.map((number) => (
-                  <button
-                    key={number}
-                    onClick={() => paginate(number)}
-                    className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                  >
-                    {number}
-                  </button>
-                ))}
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="bg-gray-300 px-4 py-2 rounded"
-                >
-                  Next
-                </button>
-              </div>
-              <span className="text-center">
-                Page {currentPage} of {totalPages}
-              </span>
-            </div>
-            <div className="mt-6 flex items-center space-x-4">
+              <div className="mt-6 flex items-center space-x-4">
               <button
                 className={`${
                   loadingDisable
@@ -328,6 +298,36 @@ const RidersList = () => {
             </div>
           </div>
         </main>
+        <footer className="bg-white p-2 shadow-md">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Next
+              </button>
+            </div>
+          </footer>
+        </div>
       </div>
 
       {/* Modal */}

@@ -5,7 +5,8 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useNavigate
+  useNavigate,
+  Navigate
 } from "react-router-dom";
 import Login from "./components/screens/Login";
 import { Dashboard } from "./components/screens/Dashboard";
@@ -19,8 +20,7 @@ import { useAuth } from "./hooks/useAuth";
 import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
-
-
+import Sidenav from './components/parts/Sidenav';
 
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
@@ -31,7 +31,6 @@ const AxiosInterceptor = ({ children }) => {
       (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
-          // Token has expired or is invalid
           logout();
           navigate('/');
         }
@@ -40,7 +39,6 @@ const AxiosInterceptor = ({ children }) => {
     );
 
     return () => {
-      // Remove the interceptor when the component unmounts
       axios.interceptors.response.eject(interceptor);
     };
   }, [navigate, logout]);
@@ -48,56 +46,64 @@ const AxiosInterceptor = ({ children }) => {
   return children;
 };
 
-// const ProtectedRoute = ({ children }) => {
-//   const { isAuthenticated, loading } = useAuth();
-
-//   if (loading) {
-//     return <div>Loading...</div>; // Or a more sophisticated loading indicator
-//   }
-
-//   if (!isAuthenticated) {
-//     return <Navigate to="/" replace />;
-//   }
-
-//   return children;
-// };
-
-function AppContent() {
-  const { loading } = useAuth();
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // Or a more sophisticated loading indicator
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+function AppContent() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Routes><Route path="*" element={<Login />} /></Routes>;
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/feedback" element={<Feedback />} />
-      <Route path="/riderslist" element={<RidersList />} />
-      <Route path="/ridersapplicant" element={<RidersApplicant />} />
-      <Route path="/manageuser" element={<ManageUser />} />
-      <Route path="/manageadmin" element={<ManageAdmin />} />
-      <Route path="/bookinghistory" element={<BookingHistory />} />
-    </Routes>
+    <div className="flex">
+      <Sidenav />
+      <div className="flex-1">
+        <main className="ml-64"> {/* Remove mt-16 and adjust ml-64 if needed */}
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/feedback" element={<Feedback />} />
+            <Route path="/riderslist" element={<RidersList />} />
+            <Route path="/ridersapplicant" element={<RidersApplicant />} />
+            <Route path="/manageuser" element={<ManageUser />} />
+            <Route path="/manageadmin" element={<ManageAdmin />} />
+            <Route path="/bookinghistory" element={<BookingHistory />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </div>
   );
 }
 
 function App() {
   return (
-    <>
+    <AuthProvider>
+      <Router>
+        <AxiosInterceptor>
+          <div className="App">
+            <AppContent />
+          </div>
+        </AxiosInterceptor>
+      </Router>
       <ToastContainer />
-        <AuthProvider>
-          <ToastContainer />
-          <Router>
-            <AxiosInterceptor>
-              <div className="App">
-                <AppContent />
-              </div>
-            </AxiosInterceptor>
-          </Router>
-        </AuthProvider>
-    </>
+    </AuthProvider>
   );
 }
 

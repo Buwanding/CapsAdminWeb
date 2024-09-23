@@ -40,6 +40,11 @@ const userService = {
     return response.data;
   },
 
+  fetchRequirements: async () => {
+    const response = await axios.get(API_URL + 'riders_req');
+    return response.data;
+  },
+
   fetchCustomers: async () => {
     try {
       const response = await axios.get(API_URL + 'customers');
@@ -55,17 +60,20 @@ const userService = {
     return response.data;
   },
 
-  getAdminById: async (editingAdminId) => {
-    const response = await axios.get(API_URL + 'admin/' + editingAdminId);
-    return response.data;
-  },
+  // getAdminById: async (editingAdminId) => {
+  //   const response = await axios.get(API_URL + 'admin/' + editingAdminId);
+  //   return response.data;
+  // },
 
-  updateAdmin: async (editingAdminId, adminData) => {
-    const response = await axios.put(API_URL + 'admin/' + editingAdminId);
-    return response.data;
+  updateAdmin: async (editingAdmin, adminData) => {
+    console.log("ANG YAWA NGA ID: ", editingAdmin.user_id);
+    try {
+      const response = await axios.put(API_URL + `update_admin/${editingAdmin.user_id}`, adminData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
-
-  
 
   updateAdminStatus: async (userId, status) => {
     try {

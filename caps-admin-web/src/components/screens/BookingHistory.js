@@ -10,7 +10,7 @@ export const BookingHistory = () => {
   const [riderSearch, setRiderSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -79,8 +79,8 @@ export const BookingHistory = () => {
       <Sidenav />
       <div className="flex flex-col w-full">
         <Header />
-        <main className="flex-grow p-4 bg-gray-100">
-          <div className="p-4">
+        <main className="flex-grow p-2 bg-gray-100">
+          <div>
             <div className="bg-white shadow rounded-lg overflow-hidden">
               <div className="p-4 border-b border-gray-200">
                 <h2 className="text-xl font-bold">Booking History</h2>
@@ -190,35 +190,35 @@ export const BookingHistory = () => {
           </div>
         </main>
         {/* Footer for Pagination */}
-        <footer className="bg-white shadow p-4 flex-shrink-0">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200'}`}
-            >
-              Previous
-            </button>
-            <div className="flex gap-2">
-              {pageNumbers.map((number) => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
-                >
-                  {number}
-                </button>
-              ))}
+        <footer className="bg-white p-2 shadow-md">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Next
+              </button>
             </div>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200'}`}
-            >
-              Next
-            </button>
-          </div>
-        </footer>
+          </footer>
       </div>
     </div>
   );

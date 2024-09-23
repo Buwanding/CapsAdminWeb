@@ -7,12 +7,12 @@ import userService from "../../services";
 const UserCard = ({ customer, handleStatusChange, loading }) => {
   return (
     <tr key={customer.user_id}>
-      <td className="py-2 px-4 border-b border-gray-200">
+      <td className="py-0.5 px-4 border-b border-gray-200">
         {customer.first_name} {customer.last_name}
       </td>
-      <td className="py-2 px-4 border-b border-gray-200 flex justify-between items-center">
+      <td className="py-0.5 px-4 border-b border-gray-200 flex justify-between items-center">
         <button
-          className={`${customer.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white px-4 py-2 rounded flex items-center justify-center`}
+          className={`${customer.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white px-2 py-1 rounded flex items-center justify-center`}
           onClick={() => handleStatusChange(customer)}
           disabled={loading}
         >
@@ -63,7 +63,7 @@ export const ManageUser = () => {
   const [searchInput, setSearchInput] = useState("");
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage] = useState(6);
+  const [customersPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -128,16 +128,16 @@ export const ManageUser = () => {
   }
 
   return (
-    <div className="flex overflow-hidden">
+    <div className="flex flex-col min-h-screen">
       <Sidenav className="fixed" />
-      <div className="flex flex-col w-full">
+      <div className="flex-grow flex flex-col">
         <Header className="fixed" />
-        <main className="flex-grow p-4 bg-gray-100">
-          <div className="p-4">
+        <main className="flex-grow bg-gray-100">
+          <div className="p-2">
             <div className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="p-4 border-b border-gray-200">
+              <div className="p-2 border-b border-gray-200">
                 <h2 className="text-xl font-bold">Users</h2>
-                <div className="flex mt-4">
+                <div className="flex">
                   <input
                     type="text"
                     placeholder="Search Names"
@@ -178,45 +178,35 @@ export const ManageUser = () => {
             </div>
           </div>
         </main>
-        <footer className="bg-white shadow p-4 flex-shrink-0">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded ${
-                currentPage === 1 ? "bg-gray-200 cursor-not-allowed" : "bg-gray-300"
-              }`}
-            >
-              Previous
-            </button>
-            <div className="flex gap-2">
-              {pageNumbers.map((number) => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-2 rounded ${
-                    number === currentPage
-                      ? "bg-gray-300 font-bold"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  {number}
-                </button>
-              ))}
+        <footer className="bg-white p-2 shadow-md">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
+                {pageNumbers.map((number) => (
+                  <button
+                    key={number}
+                    onClick={() => paginate(number)}
+                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
+              >
+                Next
+              </button>
             </div>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded ${
-                currentPage === totalPages
-                  ? "bg-gray-200 cursor-not-allowed"
-                  : "bg-gray-300"
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </footer>
+          </footer>
       </div>
     </div>
   );

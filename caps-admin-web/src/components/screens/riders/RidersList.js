@@ -19,13 +19,14 @@ const RidersList = () => {
     const fetchRiders = async () => {
       try {
         const data = await userService.fetchRiders();
+        console.log("Fetched Riders Data:", data); // Log fetched data to the console
         setRiders(data);
         setFilteredRiders(data);
       } catch (error) {
         console.error("There was an error fetching the riders!", error);
       }
     };
-
+  
     fetchRiders();
   }, []);
 
@@ -148,143 +149,161 @@ const RidersList = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-grow">
-        <Sidenav />
-        <div className="flex flex-col w-full">
-          <Header />
-          <main className="flex-grow p-4 bg-gray-100">
-            <div className="bg-white shadow-md rounded-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">RIDERS LIST</h1>
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Search Names"
-                    className="px-4 py-2 border rounded-lg"
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                  />
-                  <button
-                    className="px-4 py-2 border rounded-lg"
-                    onClick={handleFilter}
-                  >
-                    Filter
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-gray-200 rounded-lg"
-                    onClick={clearSearchAndFilter}
-                  >
-                    Clear
-                  </button>
-                </div>
-              </div>
-              <table className="w-full text-left table-auto">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2">
-                      <input
-                        type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedRiders(riders.map((rider) => rider.user_id));
-                          } else {
-                            setSelectedRiders([]);
-                          }
-                        }}
-                        checked={
-                          selectedRiders.length === riders.length &&
-                          riders.length > 0
-                        }
-                      />
-                    </th>
-                    <th className="px-4 py-2">Name</th>
-                    <th className="px-4 py-2">Phone Number</th>
-                    <th className="px-4 py-2">Status</th>
-                    <th className="px-4 py-2">License Expiration</th>
-                    <th className="px-4 py-2">OR Expiration</th>
-                    <th className="px-4 py-2">More</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((rider) => (
-                    <tr key={rider.user_id} className="border-t">
-                      <td className="px-4 py-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedRiders.includes(rider.user_id)}
-                          onChange={() => handleSelectRider(rider.user_id)}
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        {rider.first_name} {rider.last_name}
-                      </td>
-                      <td className="px-4 py-2">{rider.mobile_number}</td>
-                      <td className="px-4 py-2">
-                        {rider.status === "Active" ? (
-                          <span className="inline-flex items-center">
-                            <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                            <span>{rider.status}</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center">
-                            <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                            <span>{rider.status}</span>
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-2">
-                        {rider.license_expiration}
-                      </td>
-                      <td className="px-4 py-2">
-                        {rider.or_expiration}
-                      </td>
-                      <td className="px-4 py-2">
-                        <button
-                          className="bg-blue-500 text-white font-bold py-1 px-3 rounded hover:bg-blue-700"
-                          onClick={() => openModal(rider.user_id)}
-                        >
-                          Info
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="mt-6 flex items-center space-x-4">
+      <Sidenav />
+      <div className="flex flex-col w-full">
+        <Header />
+        <main className="flex-grow p-4 bg-gray-100">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold">VERIFIED RIDERS LIST</h1>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  placeholder="Search Names"
+                  className="px-4 py-2 border rounded-lg"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
                 <button
-                  className={`${
-                    loadingDisable
-                      ? "bg-red-700"
-                      : isAnySelectedDisabled
-                      ? "bg-red-300"
-                      : "bg-red-500 hover:bg-red-700"
-                  } text-white font-bold py-2 px-4 rounded-full`}
-                  onClick={handleDisableRiders}
-                  disabled={isAnySelectedDisabled || loadingDisable}
+                  className="px-4 py-2 border rounded-lg"
+                  onClick={handleFilter}
                 >
-                  {loadingDisable ? "Disabling..." : "Disable"}
+                  Filter
                 </button>
                 <button
-                  className={`${
-                    loadingActivate
-                      ? "bg-green-700"
-                      : isAnySelectedActive
-                      ? "bg-green-300"
-                      : "bg-green-500 hover:bg-green-700"
-                  } text-white font-bold py-2 px-4 rounded-full`}
-                  onClick={handleActivateRiders}
-                  disabled={isAnySelectedActive || loadingActivate}
+                  className="px-4 py-2 bg-gray-200 rounded-lg"
+                  onClick={clearSearchAndFilter}
                 >
-                  {loadingActivate ? "Activating..." : "Activate Rider"}
+                  Clear
                 </button>
               </div>
             </div>
-          </main>
-          <footer className="bg-white p-4 shadow-md">
+            <table className="w-full text-left table-auto">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedRiders(riders.map((rider) => rider.user_id));
+                        } else {
+                          setSelectedRiders([]);
+                        }
+                      }}
+                      checked={
+                        selectedRiders.length === riders.length &&
+                        riders.length > 0
+                      }
+                    />
+                  </th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Phone Number</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">License Expiration</th>
+                  <th className="px-4 py-2">OR Expiration</th>
+                  <th className="px-4 py-2">More</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((rider) => (
+                  <tr key={rider.user_id} className="border-t">
+                    <td className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedRiders.includes(rider.user_id)}
+                        onChange={() => handleSelectRider(rider.user_id)}
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      {rider.first_name} {rider.last_name}
+                    </td>
+                    <td className="px-4 py-2">{rider.mobile_number}</td>
+                    <td className="px-4 py-2">
+                      {rider.status === "Active" ? (
+                        <span className="inline-flex items-center">
+                          <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                          <span>{rider.status}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center">
+                          <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                          <span>{rider.status}</span>
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                    {rider.rider?.requirement_photos?.length > 0 ? (
+                      rider.rider.requirement_photos
+                        .filter((photo) => photo.requirement_id === 7)
+                        .map((photo, index) => (
+                          <>
+                            <span key={index}>{photo.photo_url}</span>
+                          </>
+                        ))
+                    ) : (
+                      'No License Expiration Date'
+                    )}
+                    </td>
+                    <td>
+                      {rider.rider?.requirement_photos?.length > 0 ? (
+                        rider.rider.requirement_photos
+                          .filter((photo) => photo.requirement_id === 3)
+                          .map((photo, index) => (
+                            <span key={index}>{photo.photo_url}</span>
+                          ))
+                      ) : (
+                        'No OR Expiration Date'
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
+                        onClick={() => openModal(rider.user_id)}
+                      >
+                        Info
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+              <div className="mt-6 flex items-center space-x-4">
+              <button
+                className={`${
+                  loadingDisable
+                    ? "bg-red-700"
+                    : isAnySelectedDisabled
+                    ? "bg-red-300"
+                    : "bg-red-500 hover:bg-red-700"
+                } text-white font-bold py-2 px-4 rounded-full`}
+                onClick={handleDisableRiders}
+                disabled={isAnySelectedDisabled || loadingDisable}
+              >
+                {loadingDisable ? "Disabling..." : "Disable"}
+              </button>
+              <button
+                className={`${
+                  loadingActivate
+                    ? "bg-green-700"
+                    : isAnySelectedActive
+                    ? "bg-green-300"
+                    : "bg-green-500 hover:bg-green-700"
+                } text-white font-bold py-2 px-4 rounded-full`}
+                onClick={handleActivateRiders}
+                disabled={isAnySelectedActive || loadingActivate}
+              >
+                {loadingActivate ? "Activating..." : "Activate Rider"}
+              </button>
+            </div>
+          </div>
+        </main>
+        <footer className="bg-white p-2 shadow-md">
             <div className="flex justify-between items-center">
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
               >
                 Previous
               </button>
@@ -293,7 +312,7 @@ const RidersList = () => {
                   <button
                     key={number}
                     onClick={() => paginate(number)}
-                    className={`px-4 py-2 rounded ${number === currentPage ? 'bg-gray-300 font-bold' : 'bg-gray-200'}`}
+                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
                   >
                     {number}
                   </button>
@@ -302,7 +321,7 @@ const RidersList = () => {
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="bg-gray-300 px-4 py-2 rounded"
+                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
               >
                 Next
               </button>
@@ -313,42 +332,42 @@ const RidersList = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 className="text-xl font-bold mb-4">Rider Information</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white w-1/2 p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold text-yellow-600 mb-4">Rider Information</h2>
             {modalInfo && (
-              <>
+              <div className="space-y-2">
                 <p>
-                  <strong>Name:</strong> {modalInfo.first_name}{" "}
-                  {modalInfo.last_name}
+                  <strong className="text-gray-700">Name:</strong> {modalInfo.first_name} {modalInfo.last_name}
                 </p>
                 <p>
-                  <strong>Phone Number:</strong> {modalInfo.mobile_number}
+                  <strong className="text-gray-700">Phone Number:</strong> {modalInfo.mobile_number}
                 </p>
                 <p>
-                  <strong>Status:</strong> {modalInfo.status}
+                  <strong className="text-gray-700">Status:</strong> {modalInfo.status}
                 </p>
                 <p>
-                  <strong>License Expiration:</strong>{" "}
-                  {modalInfo.license_expiration}
+                  <strong className="text-gray-700">License Expiration:</strong> {modalInfo.license_expiration}
                 </p>
                 <p>
-                  <strong>OR Expiration:</strong> {modalInfo.or_expiration}
+                  <strong className="text-gray-700">OR Expiration:</strong> {modalInfo.or_expiration}
                 </p>
                 <p>
-                  <strong>Email:</strong> {modalInfo.email}
+                  <strong className="text-gray-700">Email:</strong> {modalInfo.email}
                 </p>
                 <p>
-                  <strong>Date of Birth:</strong> {modalInfo.date_of_birth}
+                  <strong className="text-gray-700">Date of Birth:</strong> {modalInfo.date_of_birth ? new Date(modalInfo.date_of_birth).toLocaleDateString() : 'N/A'}
                 </p>
-              </>
+              </div>
             )}
-            <button
-              className="mt-4 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700"
-              onClick={closeModal}
-            >
-              Close
-            </button>
+            <div className="mt-6 flex justify-end">
+              <button
+                className="bg-yellow-600 text-white py-2 px-6 rounded hover:bg-yellow-500 focus:outline-none"
+                onClick={closeModal}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

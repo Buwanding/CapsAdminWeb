@@ -6,7 +6,7 @@ import defaultProfileLogo from "../../pictures/avatar.png"; // Import the defaul
 
 // Define a UserCard component to display individual user information
 const UserCard = ({ rider, onMoreInfo }) => {
-  const { user, requirement_photos: documents } = rider; // Extract user and requirement_photos from the rider object
+  const { user, requirementphotos } = rider; // Extract user and requirement_photos from the rider object
 
   return (
     <div className="border p-2 rounded-lg shadow-sm bg-white mb-4">
@@ -24,8 +24,9 @@ const UserCard = ({ rider, onMoreInfo }) => {
         <div className="ml-auto">
           <button
             onClick={(e) => {
+              console.log(user)
               e.stopPropagation(); // Prevent click event from bubbling up
-              onMoreInfo(user); // Trigger the onMoreInfo callback
+              onMoreInfo(user, requirementphotos); // Trigger the onMoreInfo callback
             }}
             className="bg-gray-700 text-white px-2 py-1 rounded hover:bg-gray-400 transition-colors"
           >
@@ -37,11 +38,22 @@ const UserCard = ({ rider, onMoreInfo }) => {
   );
 };
 
-const Modal = ({ user, onClose }) => {
-  if (!user) return null;
+const Modal = ({ user, requirementphotos, onClose }) => {
+  if (!requirementphotos || !user) return null;
 
-  // Safely handle the case where `user.documents` might be undefined
-  const documents = user.documents || [];
+  const requirementMapping = {
+    1: "Motorcycle Picture",
+    2: "ROCR",
+    3: "OR Expiration Date",
+    4: "COR",
+    5: "Drivers License",
+    6: "Drivers License Number",
+    7: "License Expiration Date",
+    8: "TPL Insurance",
+    9: "Barangay Clearance",
+    10: "Police Clearance",
+    11: "Plate Number"
+  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
@@ -55,18 +67,19 @@ const Modal = ({ user, onClose }) => {
             />
           </div>
           <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold mb-2">{user.first_name}{user.last_name}</h2> {/* Increased font size */}
+            <h2 className="text-3xl font-bold mb-2">{user.first_name} {user.last_name}</h2>
             <p className="text-gray-600 text-lg mb-4">@{user.user_name}</p>
-            <h3 className="text-xl font-semibold mb-2">Documents</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {documents.length > 0 ? (
-                documents.map((doc, index) => (
+            <h3 className="text-xl font-semibold mb-2">Requirements</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> {/* Changed to 3 columns */}
+              {requirementphotos.length > 0 ? (
+                requirementphotos.map((photo, index) => (
                   <div key={index} className="bg-gray-200 p-4 rounded text-center">
-                    <p className="text-gray-700">{doc}</p>
+                    <p className="text-gray-700">{requirementMapping[photo.requirement_id]}</p>
+                    <p className="text-gray-700">{photo.photo_url}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-600">No documents available</p>
+                <p className="text-gray-600">No requirements available</p>
               )}
             </div>
           </div>
@@ -170,7 +183,7 @@ export const RidersApplicant = () => {
                 <UserCard
                   key={index}
                   rider={rider}
-                  onMoreInfo={(user) => setSelectedUser(user)}
+                  onMoreInfo={() => setSelectedUser({ user: rider.user, requirementphotos: rider.requirementphotos })}
                 />
               ))}
             </div>
@@ -208,7 +221,11 @@ export const RidersApplicant = () => {
         </div>
       </div>
       {/* Modal for User Details */}
-      <Modal user={selectedUser} onClose={() => setSelectedUser(null)} />
-    </div>
+      <Modal 
+        user={selectedUser?.user} 
+        requirementphotos={selectedUser?.requirementphotos} 
+        onClose={() => setSelectedUser(null)} 
+      />
+</div>
   );
 };

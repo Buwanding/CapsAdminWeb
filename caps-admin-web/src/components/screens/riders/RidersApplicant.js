@@ -69,6 +69,8 @@ const Modal = ({ user, requirementphotos, onClose }) => {
           <div className="text-center md:text-left">
             <h2 className="text-3xl font-bold mb-2">{user.first_name} {user.last_name}</h2>
             <p className="text-gray-600 text-lg mb-4">@{user.user_name}</p>
+            <p className="text-gray-600 text-lg mb-4">{user.mobile_number}</p>
+            <p className="text-gray-600 text-lg mb-4">{user.email}</p>
             <h3 className="text-xl font-semibold mb-2">Requirements</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> {/* Changed to 3 columns */}
               {requirementphotos.length > 0 ? (
@@ -124,7 +126,7 @@ export const RidersApplicant = () => {
   // Update filteredRiders whenever searchInput changes
   useEffect(() => {
     const filtered = riders.filter((rider) =>
-      `${rider.user.first_name} ${rider.user.last_name} ${rider.user.user_name}`
+      `${rider.user.first_name} ${rider.user.last_name} ${rider.user.user_name}${rider.user.user_name}`
         .toLowerCase()
         .includes(searchInput.toLowerCase())
     );

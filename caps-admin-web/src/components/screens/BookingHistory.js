@@ -148,6 +148,7 @@ export const BookingHistory = () => {
                         <th className="py-2 px-4 border-b border-gray-200 text-left">Customer</th>
                         <th className="py-2 px-4 border-b border-gray-200">Rider</th>
                         <th className="py-2 px-4 border-b border-gray-200">Date & Time</th>
+                        <th className="py-2 px-4 border-b border-gray-200">Type</th>
                         <th className="py-2 px-4 border-b border-gray-200">Pick Up Location</th>
                         <th className="py-2 px-4 border-b border-gray-200">Drop Off Location</th>
                         <th className="py-2 px-4 border-b border-gray-200">Fare</th>
@@ -172,9 +173,8 @@ export const BookingHistory = () => {
                             <td className="py-2 px-4 border-b border-gray-200">
                               {booking.rider ? `${booking.rider.first_name} ${booking.rider.last_name}` : 'N/A'}
                             </td>
-                            <td className="py-2 px-4 border-b border-gray-200">
-                              {rideDateTime}
-                            </td>
+                            <td className="py-2 px-4 border-b border-gray-200">{rideDateTime}</td>
+                            <td className="py-2 px-4 border-b border-gray-200">{booking.ride_type}</td>
                             <td className="py-2 px-4 border-b border-gray-200">{booking.pickup_location}</td>
                             <td className="py-2 px-4 border-b border-gray-200">{booking.dropoff_location}</td>
                             <td className="py-2 px-4 border-b border-gray-200">{booking.fare}</td>

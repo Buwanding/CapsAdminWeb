@@ -11,8 +11,17 @@ const UserCard = ({ customer, handleStatusChange, loading }) => {
         {customer.first_name} {customer.last_name}
       </td>
       <td className="py-0.5 px-4 border-b border-gray-200 flex justify-between items-center">
+        <span
+          className={`px-4 py-2 rounded ${
+            customer.status === "Active" ? "text-green-600" : "text-red-600"
+          } text-gray-400 font-bold`}
+        >
+          {customer.status}
+        </span>
         <button
-          className={`${customer.status === "Active" ? "bg-red-500" : "bg-green-500"} text-white px-2 py-1 rounded flex items-center justify-center`}
+          className={`${
+            customer.status === "Active" ? "bg-red-500" : "bg-green-500"
+          } text-white px-2 py-1 rounded flex items-center justify-center`}
           onClick={() => handleStatusChange(customer)}
           disabled={loading}
         >
@@ -42,16 +51,6 @@ const UserCard = ({ customer, handleStatusChange, loading }) => {
           ) : (
             "Enable"
           )}
-        </button>
-        <span
-          className={`px-4 py-2 rounded ${
-            customer.status === "Active" ? "text-green-600" : "text-red-600"
-          } text-gray-400 font-bold`}
-        >
-          {customer.status}
-        </span>
-        <button className="ml-4">
-          <ChevronDownIcon className="w-5 h-5 text-gray-800" />
         </button>
       </td>
     </tr>
@@ -159,7 +158,7 @@ export const ManageUser = () => {
                     <th className="py-2 px-4 border-b border-gray-200 text-left">
                       Customer Name
                     </th>
-                    <th className="py-2 px-4 border-b border-gray-200">
+                    <th className="py-2 px-7 border-b border-gray-200 text-right mr-4">
                       Status
                     </th>
                   </tr>
@@ -179,34 +178,44 @@ export const ManageUser = () => {
           </div>
         </main>
         <footer className="bg-white p-2 shadow-md">
-            <div className="flex justify-between items-center">
-              <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
-              >
-                Previous
-              </button>
-              <div className="flex gap-2">
-                {pageNumbers.map((number) => (
-                  <button
-                    key={number}
-                    onClick={() => paginate(number)}
-                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
-                  >
-                    {number}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
-              >
-                Next
-              </button>
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`bg-gray-300 px-2 py-1 rounded ${
+                currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+              }`}
+            >
+              Previous
+            </button>
+            <div className="flex gap-2">
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  className={`px-2 py-1 rounded ${
+                    number === currentPage
+                      ? "cursor-not-allowed bg-gray-200"
+                      : "bg-gray-300 font-bold"
+                  }`}
+                >
+                  {number}
+                </button>
+              ))}
             </div>
-          </footer>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`bg-gray-300 px-2 py-1 rounded ${
+                currentPage === totalPages
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   );

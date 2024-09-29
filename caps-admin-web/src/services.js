@@ -1,5 +1,5 @@
 import axios from "axios";
-import API_URL from "./api_url";
+import { API_URL, img_url } from "./api_url";
 
 const userService = {
   login: async (email, password) => {

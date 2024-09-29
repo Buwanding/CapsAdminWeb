@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
+import { API_URL, img_url } from "../../../api_url";
 import defaultProfileLogo from "../../pictures/avatar.png"; // Import the default logo
 import { X } from 'react-feather';
 
@@ -42,12 +43,11 @@ const UserCard = ({ rider, onMoreInfo }) => {
 
 
 const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
-  const [selectedImage, setSelectedImage] = useState(null); // State to hold the selected image for enlargement
+  const [selectedImage, setSelectedImage] = useState(null);
 
   if (!requirementphotos || !user) return null;
-  console.log(verification_status);
 
-  const BASE_URL = "http://192.168.36.124:8000/storage/";
+  const BASE_URL = `${img_url}/storage/`;
 
   const requirementMapping = {
     1: "Motorcycle Picture",
@@ -65,9 +65,9 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
 
   const renderRequirement = (photo) => {
     const fullUrl = `${BASE_URL}${photo.photo_url}`;
-
+    
     const handleImageClick = () => {
-      setSelectedImage(fullUrl); // Set the selected image to enlarge it
+      setSelectedImage(fullUrl);
     };
 
     return (
@@ -77,7 +77,7 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
           src={fullUrl}
           alt={requirementMapping[photo.requirement_id]}
           className="w-full h-auto rounded cursor-pointer"
-          onClick={handleImageClick} // Make the image clickable
+          onClick={handleImageClick}
         />
       </div>
     );
@@ -86,8 +86,6 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
-        
-
         <div className="flex flex-col md:flex-row items-center md:items-start">
           <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
             <img
@@ -96,14 +94,25 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
               className="h-32 w-32 rounded-full mx-auto"
             />
           </div>
-          <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold mb-2">{user.first_name} {user.last_name}</h2>
+          <div className="text-center md:text-left flex-grow">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-3xl font-bold">{user.first_name} {user.last_name}</h2>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                onClick={() => {
+                  // Add your verification logic here
+                  console.log("Verify clicked for user:", user.user_name);
+                }}
+              >
+                Verify
+              </button>
+            </div>
             <p className="text-xs"><span className={`${verification_status === "Verified" ? "text-green-600" : "text-yellow-600"}`}>{verification_status}</span></p>
             <p className="text-gray-600 text-lg mb-1">{user.user_name}</p>
             <p className="text-gray-600 text-lg mb-1">{user.mobile_number}</p>
             <p className="text-gray-600 text-lg mb-1">{user.email}</p>
             <h3 className="text-xl font-semibold mb-2">Requirements</h3>
-            <div className="max-h-60 overflow-y-auto"> {/* Make this container scrollable */}
+            <div className="max-h-60 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {requirementphotos.length > 0 ? (
                   requirementphotos.map(renderRequirement)
@@ -122,11 +131,9 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
         </button>
       </div>
 
-      {/* Image Enlarger Modal */}
       {selectedImage && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-lg w-full relative"> {/* Make this relative */}
-            {/* Close Icon inside the modal */}
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-lg w-full relative">
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute top-2 right-2 text-red-600 hover:text-red-800 transition-colors"
@@ -144,7 +151,6 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
     </div>
   );
 };
-
 
 
 

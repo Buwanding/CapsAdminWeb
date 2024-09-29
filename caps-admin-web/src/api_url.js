@@ -1,4 +1,5 @@
-const API_URL = "http://192.168.36.124:8000/api/user/";
+const img_url = "http://192.168.36.124:8000"; //<----Change IP address here only
+const API_URL = img_url+"/api/user/";
 
 
-export default API_URL;
+export { API_URL, img_url };

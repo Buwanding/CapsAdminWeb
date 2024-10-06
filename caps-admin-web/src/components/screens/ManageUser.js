@@ -53,7 +53,7 @@ const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
           )}
         </button>
       </td>
-      <td className="px-4 py-2 text-center">
+      <td className="py-0.5 px-4 text-center">
         <button
           className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
           onClick={() => openModal(customer)}
@@ -179,7 +179,7 @@ export const ManageUser = () => {
                     <th className="py-2 px-4 border-b border-gray-200 text-left">
                       Customer Name
                     </th>
-                    <th className="px-4 border-b border-gray-200 py-2">
+                    <th className="px-4 border-b border-gray-200 py-2 text-right ">
                       Status
                     </th>
                     <th className="px-4 border-b border-gray-200 py-2">More</th>

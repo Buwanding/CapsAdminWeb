@@ -4,13 +4,13 @@ import Header from "../parts/Header";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import userService from "../../services";
 
-const UserCard = ({ customer, handleStatusChange, loading }) => {
+const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
   return (
     <tr key={customer.user_id}>
-      <td className="py-0.5 px-4 border-b border-gray-200">
+      <td className="py-0.5 px-4 ">
         {customer.first_name} {customer.last_name}
       </td>
-      <td className="py-0.5 px-4 border-b border-gray-200 flex justify-between items-center">
+      <td className="py-0.5 px-4  flex justify-between items-center">
         <span
           className={`px-4 py-2 rounded ${
             customer.status === "Active" ? "text-green-600" : "text-red-600"
@@ -53,6 +53,14 @@ const UserCard = ({ customer, handleStatusChange, loading }) => {
           )}
         </button>
       </td>
+      <td className="px-4 py-2 text-center">
+        <button
+          className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
+          onClick={() => openModal(customer)}
+        >
+          Info
+        </button>
+      </td>
     </tr>
   );
 };
@@ -64,6 +72,8 @@ export const ManageUser = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -105,7 +115,15 @@ export const ManageUser = () => {
       setLoading(false);
     }
   };
+  const openModal = (customer) => {
+    setSelectedCustomer(customer);
+    setShowModal(true);
+  };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedCustomer(null);
+  };
   // Pagination Logic
   const indexOfLastCustomer = currentPage * customersPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
@@ -125,6 +143,9 @@ export const ManageUser = () => {
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
+
+ 
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -152,15 +173,16 @@ export const ManageUser = () => {
                   </button>
                 </div>
               </div>
-              <table className="min-w-full bg-white">
+              <table className="min-w-full bg-white table-auto">
                 <thead>
                   <tr>
                     <th className="py-2 px-4 border-b border-gray-200 text-left">
                       Customer Name
                     </th>
-                    <th className="py-2 px-7 border-b border-gray-200 text-right mr-4">
+                    <th className="px-4 border-b border-gray-200 py-2">
                       Status
                     </th>
+                    <th className="px-4 border-b border-gray-200 py-2">More</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -170,6 +192,7 @@ export const ManageUser = () => {
                       customer={customer}
                       handleStatusChange={handleStatusChange}
                       loading={loading}
+                      openModal={openModal}
                     />
                   ))}
                 </tbody>
@@ -217,6 +240,30 @@ export const ManageUser = () => {
           </div>
         </footer>
       </div>
+      {/* Modal for User Info */}
+      {showModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded shadow-md w-96">
+            <h2 className="text-xl font-bold mb-4">User Information</h2>
+            <p>
+              <strong>Name:</strong> {selectedCustomer.first_name}{" "}
+              {selectedCustomer.last_name}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedCustomer.status}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedCustomer.email}
+            </p>
+            <button
+              className="bg-gray-700 text-white font-bold py-1 px-3 rounded mt-4"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

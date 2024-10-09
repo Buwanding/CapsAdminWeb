@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
-import { API_URL, img_url } from "../../../api_url";
-import defaultProfileLogo from "../../pictures/avatar.png"; // Import the default logo
-import { X } from 'react-feather';
+import { img_url } from "../../../api_url";
+import defaultProfileLogo from "../../pictures/avatar.png";
+import { X, Loader } from 'react-feather';
 
 // Define a UserCard component to display individual user information
 const UserCard = ({ rider, onMoreInfo }) => {
-  const { user, requirementphotos, verification_status } = rider; // Extract user and requirement_photos from the rider object
+  const { user, requirementphotos, verification_status } = rider;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -50,9 +50,10 @@ const UserCard = ({ rider, onMoreInfo }) => {
   );
 };
 
-const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
+const Modal = ({ verification_status, user, requirementphotos, onClose, onStatusChange }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentStatus, setCurrentStatus] = useState(verification_status);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!user) return null;
 
@@ -81,7 +82,20 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
     }
   };
 
-  const handleVerify = () => {
+  const handleVerificationToggle = async () => {
+    setIsLoading(true);
+    try {
+      const newStatus = currentStatus === "Verified" ? "Pending" : "Verified";
+      const response = await userService.verifyRider(user.user_id, newStatus);
+      if (response) {
+        setCurrentStatus(newStatus);
+        onStatusChange(user.user_id, newStatus);
+      }
+    } catch (error) {
+      console.error("Error toggling verification status:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderRequirement = (photo) => {
@@ -127,14 +141,20 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
           <div className="text-center md:text-left flex-grow">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-3xl font-bold">{user.first_name} {user.last_name}</h2>
-              {currentStatus !== "Verified" && (
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
-                  onClick={handleVerify}
-                >
-                  Verify
-                </button>
-              )}
+              <button
+                className={`px-4 py-2 rounded transition-colors ${
+                  currentStatus === "Verified"
+                    ? "bg-orange-500 hover:bg-orange-600 text-white"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                } flex items-center justify-center`}
+                onClick={handleVerificationToggle}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader className="animate-spin mr-2" size={16} />
+                ) : null}
+                {currentStatus === "Verified" ? "Unverify" : "Verify"}
+              </button>
             </div>
             <p className="text-xs"><span className={statusColor}>{currentStatus}</span></p>
             <p className="text-gray-600 text-lg mb-1">{user.user_name}</p>
@@ -181,24 +201,22 @@ const Modal = ({ verification_status, user, requirementphotos, onClose }) => {
   );
 };
 
-
-
 export const RidersApplicant = () => {
-  const [riders, setRiders] = useState([]); // State to store all fetched riders
+  const [riders, setRiders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of items per page
-  const [selectedUser, setSelectedUser] = useState(null); // State for selected user
+  const [itemsPerPage] = useState(5);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [filteredRiders, setFilteredRiders] = useState([]);
 
-  // Fetch users with "Rider" role from the API
   useEffect(() => {
     const fetchRiders = async () => {
       try {
         const data = await userService.fetchRequirements();
-        setRiders(data);
-        setFilteredRiders(data);
-        console.log(data);
+        const sortedData = sortRiders(data);
+        setRiders(sortedData);
+        setFilteredRiders(sortedData);
+        console.log(sortedData);
       } catch (error) {
         console.error("Error fetching riders:", error);
       }
@@ -207,37 +225,59 @@ export const RidersApplicant = () => {
     fetchRiders();
   }, []);
 
-  // Update filteredRiders whenever searchInput changes
+  const sortRiders = (ridersList) => {
+    const order = { "Pending": 0, "Verified": 1, "Unverified": 2 };
+    return ridersList.sort((a, b) => 
+      order[a.verification_status] - order[b.verification_status]
+    );
+  };
+
   useEffect(() => {
     const filtered = riders.filter((rider) =>
       `${rider.user.first_name} ${rider.user.last_name} ${rider.user.user_name}${rider.user.user_name}${rider.verification_status}`
         .toLowerCase()
         .includes(searchInput.toLowerCase())
     );
-    setFilteredRiders(filtered);
-    setCurrentPage(1); // Reset to first page when search changes
+    const sortedFiltered = sortRiders(filtered);
+    setFilteredRiders(sortedFiltered);
+    setCurrentPage(1);
   }, [searchInput, riders]);
 
   const clearSearch = () => {
     setSearchInput("");
   };
 
-  // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentRiders = filteredRiders.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Change Page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Calculate Total Pages
   const totalPages = Math.ceil(filteredRiders.length / itemsPerPage);
 
-  // Generate Page Numbers
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
+
+  const handleStatusChange = (userId, newStatus) => {
+    setRiders(prevRiders => {
+      const updatedRiders = prevRiders.map(rider =>
+        rider.user.user_id === userId
+          ? { ...rider, verification_status: newStatus }
+          : rider
+      );
+      return sortRiders(updatedRiders);
+    });
+    setFilteredRiders(prevFilteredRiders => {
+      const updatedFilteredRiders = prevFilteredRiders.map(rider =>
+        rider.user.user_id === userId
+          ? { ...rider, verification_status: newStatus }
+          : rider
+      );
+      return sortRiders(updatedFilteredRiders);
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -274,7 +314,6 @@ export const RidersApplicant = () => {
               ))}
             </div>
           </main>
-          {/* Footer with Pagination */}
           <footer className="bg-white p-2 shadow-md">
             <div className="flex justify-between items-center">
               <button
@@ -306,12 +345,15 @@ export const RidersApplicant = () => {
           </footer>
         </div>
       </div>
-      {/* Modal for User Details */}
-      <Modal 
-        user={selectedUser?.user} 
-        requirementphotos={selectedUser?.requirementphotos} 
-        onClose={() => setSelectedUser(null)} 
-      />
-</div>
+      {selectedUser && (
+        <Modal 
+          user={selectedUser.user} 
+          requirementphotos={selectedUser.requirementphotos}
+          verification_status={selectedUser.verification_status}
+          onClose={() => setSelectedUser(null)}
+          onStatusChange={handleStatusChange}
+        />
+      )}
+    </div>
   );
 };

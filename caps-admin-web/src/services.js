@@ -128,6 +128,16 @@ const userService = {
     }
   },
 
+  verifyRider: async (userId, status) => {
+    try {
+      const response = await axios.put(`${API_URL}verify_rider/${userId}`, { status });
+      return response.data;
+    } catch (error) {
+      console.error('Error Verifying Rider:', error);
+      throw error;
+    }
+  },
+
 };
 
 export default userService;

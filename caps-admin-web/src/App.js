@@ -21,7 +21,8 @@ import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Sidenav from './components/parts/Sidenav';
-
+import Settings from "./components/Settings";
+import ManageAccount from "./components/ManageAccount";
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -75,7 +76,9 @@ function AppContent() {
     <div className="flex">
       <Sidenav />
       <div className="flex-1">
-        <main className="ml-64"> {/* Remove mt-16 and adjust ml-64 if needed */}
+        <main className="ml-64">
+          {" "}
+          {/* Remove mt-16 and adjust ml-64 if needed */}
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/feedback" element={<Feedback />} />
@@ -84,6 +87,8 @@ function AppContent() {
             <Route path="/manageuser" element={<ManageUser />} />
             <Route path="/manageadmin" element={<ManageAdmin />} />
             <Route path="/bookinghistory" element={<BookingHistory />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/manageacc" element={<ManageAccount />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>

@@ -58,7 +58,7 @@ const Header = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <a
-                        href="#"
+                        onClick={() => navigate("/settings")} // Navigate to Settings
                         className={`block px-4 py-2 ${
                           active ? "bg-gray-300" : ""
                         }`}
@@ -70,7 +70,7 @@ const Header = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <a
-                        href="#"
+                        onClick={() => navigate("/manageacc")} // Navigate to Settings
                         className={`block px-4 py-2 ${
                           active ? "bg-gray-300" : ""
                         }`}
@@ -126,11 +126,16 @@ const Header = () => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="bg-white p-6 rounded-lg shadow-xl">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
                     Confirm Logout
                   </Dialog.Title>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">Are you sure you want to log out?</p>
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to log out?
+                    </p>
                   </div>
 
                   <div className="mt-4 flex space-x-4 justify-end">

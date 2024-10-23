@@ -51,7 +51,7 @@ const userService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching customers:', error);
-      throw error;  // Re-throw the error so it can be caught in the component
+      throw error;
     }
   },
 

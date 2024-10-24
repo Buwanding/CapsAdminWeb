@@ -55,18 +55,7 @@ const Header = () => {
                   />
                 </Menu.Button>
                 <Menu.Items className="absolute right-0 mt-2 w-48 bg-[#343536] shadow-lg rounded-lg overflow-hidden">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a
-                        onClick={() => navigate("/settings")} // Navigate to Settings
-                        className={`block px-4 py-2 ${
-                          active ? "bg-gray-300" : ""
-                        }`}
-                      >
-                        Settings
-                      </a>
-                    )}
-                  </Menu.Item>
+                 
                   <Menu.Item>
                     {({ active }) => (
                       <a

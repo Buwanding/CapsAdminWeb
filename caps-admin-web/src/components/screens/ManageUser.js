@@ -7,10 +7,10 @@ import userService from "../../services";
 const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
   return (
     <tr key={customer.user_id}>
-      <td className="py-0.5 px-4 ">
+      <td className="py-0.5 px-4">
         {customer.first_name} {customer.last_name}
       </td>
-      <td className="py-0.5 px-4  flex justify-between items-center">
+      <td className="py-0.5 px-4 text-center">
         <span
           className={`px-4 py-2 rounded ${
             customer.status === "Active" ? "text-green-600" : "text-red-600"
@@ -18,10 +18,13 @@ const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
         >
           {customer.status}
         </span>
+      </td>
+
+      <td className="py-0.5 px-4 text-right">
         <button
           className={`${
             customer.status === "Active" ? "bg-red-500" : "bg-green-500"
-          } text-white px-2 py-1 rounded flex items-center justify-center`}
+          } text-white px-2 py-1 rounded`}
           onClick={() => handleStatusChange(customer)}
           disabled={loading}
         >
@@ -53,6 +56,7 @@ const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
           )}
         </button>
       </td>
+
       <td className="py-0.5 px-4 text-center">
         <button
           className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
@@ -179,10 +183,13 @@ export const ManageUser = () => {
                     <th className="py-2 px-4 border-b border-gray-200 text-left">
                       Customer Name
                     </th>
-                    <th className="px-4 border-b border-gray-200 py-2 text-right ">
+                    <th className="px-4 border-b border-gray-200 py-2 text-center ">
                       Status
                     </th>
-                    <th className="px-4 border-b border-gray-200 py-2">More</th>
+                    <th className="px-4 border-b border-gray-200 py-2 text-right ">
+                      Action
+                    </th>
+                    <th className="px-4 border-b border-gray-200 py-2 ">More</th>
                   </tr>
                 </thead>
                 <tbody>

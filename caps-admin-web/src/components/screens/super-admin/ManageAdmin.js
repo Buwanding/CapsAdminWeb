@@ -107,7 +107,7 @@ const ManageAdmin = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidenav />
       <div className="flex flex-col w-full">
         <Header />
@@ -129,12 +129,14 @@ const ManageAdmin = () => {
               </header>
 
               <div className="p-4">
-              {showForm && (
+                {showForm && (
                   <AddAdminForm
                     setShowForm={setShowForm}
                     setAdmin={setAdmin}
                     editingAdminId={editingAdminId}
-                    editingAdmin={admin.find(a => a.user_id === editingAdminId)}
+                    editingAdmin={admin.find(
+                      (a) => a.user_id === editingAdminId
+                    )}
                     onSuccess={handleSuccess}
                   />
                 )}
@@ -154,10 +156,10 @@ const ManageAdmin = () => {
         </main>
       </div>
       {successMessage && (
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        {successMessage}
-      </div>
-    )}
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md">
+          {successMessage}
+        </div>
+      )}
     </div>
   );
 };

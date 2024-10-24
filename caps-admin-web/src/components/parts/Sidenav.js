@@ -21,6 +21,7 @@ const Sidenav = () => {
     { path: "/dashboard", label: "Dashboard" },
     { path: "/riderslist", label: "Manage Riders", parent: "Riders" },
     { path: "/ridersapplicant", label: "Rider Applications", parent: "Riders" },
+    { path: "/riderspayment", label: "Rider Payment", parent: "RidersPayment" },
     { path: "/manageuser", label: "Manage Users" },
     { path: "/manageadmin", label: "Manage Admin", role: 1 },
     { path: "/bookinghistory", label: "Booking History" },
@@ -49,7 +50,7 @@ const Sidenav = () => {
         >
           Dashboard
         </button>
-  
+
         {/* Riders */}
         <Disclosure defaultOpen={isParentActive("Riders")}>
           {({ open }) => (
@@ -78,10 +79,28 @@ const Sidenav = () => {
                     </button>
                   ))}
               </Disclosure.Panel>
+              <Disclosure.Panel className="bg-gray-800 text-white">
+                {menuItems
+                  .filter((item) => item.parent === "RidersPayment")
+                  .map((child, childIndex) => (
+                    <button
+                      key={childIndex}
+                      onClick={() => handleClick(child.path)}
+                      className={`block w-full text-left px-4 py-2 ${
+                        isActive(child.path)
+                          ? "bg-yellow-600 text-white cursor-not-allowed"
+                          : "hover:bg-gray-700"
+                      }`}
+                      disabled={isActive(child.path)}
+                    >
+                      {child.label}
+                    </button>
+                  ))}
+              </Disclosure.Panel>
             </>
           )}
         </Disclosure>
-  
+
         {/* Manage Users */}
         <button
           onClick={() => handleClick("/manageuser")}
@@ -94,7 +113,7 @@ const Sidenav = () => {
         >
           Manage Users
         </button>
-  
+
         {/* Manage Admin */}
         {userRole === 1 && (
           <button
@@ -109,7 +128,7 @@ const Sidenav = () => {
             Manage Admin
           </button>
         )}
-  
+
         {/* Booking History */}
         <button
           onClick={() => handleClick("/bookinghistory")}
@@ -122,7 +141,7 @@ const Sidenav = () => {
         >
           Booking History
         </button>
-  
+
         {/* Feedback */}
         <button
           onClick={() => handleClick("/feedback")}

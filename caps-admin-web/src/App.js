@@ -23,6 +23,7 @@ import { ToastContainer } from 'react-toastify';
 import Sidenav from './components/parts/Sidenav';
 import Settings from "./components/Settings";
 import ManageAccount from "./components/ManageAccount";
+import RidersPayment from "./components/screens/riders/RidersPayment";
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -84,6 +85,7 @@ function AppContent() {
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/riderslist" element={<RidersList />} />
             <Route path="/ridersapplicant" element={<RidersApplicant />} />
+            <Route path="/riderspayment" element={<RidersPayment />} />
             <Route path="/manageuser" element={<ManageUser />} />
             <Route path="/manageadmin" element={<ManageAdmin />} />
             <Route path="/bookinghistory" element={<BookingHistory />} />

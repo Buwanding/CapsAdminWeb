@@ -247,18 +247,19 @@ const RidersList = () => {
                           : "No License Expiration Date"}
                       </td>
                       <td>
-                       <span>
-                        
-                       </span>
-                      </td>
-                      <td>
-                        {rider.rider?.requirement_photos?.length > 0
+                      {rider.rider?.requirement_photos?.length > 0
                           ? rider.rider.requirement_photos
                               .filter((photo) => photo.requirement_id === 3)
                               .map((photo, index) => (
                                 <span key={index}>{photo.photo_url}</span>
                               ))
                           : "No OR Expiration Date"}
+                       
+                      </td>
+                      <td>
+                      <span>
+                        Paid
+                       </span>
                       </td>
                       <td className="px-4 py-2">
                         <button

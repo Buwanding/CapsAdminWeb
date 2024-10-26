@@ -19,7 +19,6 @@ const Header = () => {
       navigate("/");
     } catch (error) {
       console.error("Logout failed", error);
-      // Handle any errors (e.g., show an error message to the user)
     }
   };
 
@@ -34,7 +33,7 @@ const Header = () => {
   return (
     <>
       {/* Header Component */}
-      <header className="bg-black text-white flex items-center justify-between p-4">
+      <header className="bg-black text-white flex items-center justify-between p-4 relative z-50">
         <div className="p-4 flex items-center space-x-2">
           {/* <img src={logo} alt="Logo" className="h-10 w-10" />
           <span className="text-white font-bold text-xl">PickMeUp</span> */}
@@ -54,14 +53,13 @@ const Header = () => {
                     className="h-6 w-6 rounded-full"
                   />
                 </Menu.Button>
-                <Menu.Items className="absolute right-0 mt-2 w-48 bg-[#343536] shadow-lg rounded-lg overflow-hidden">
-                 
+                <Menu.Items className="absolute right-0 mt-2 w-48 bg-[#343536] shadow-lg rounded-lg overflow-hidden z-50">
                   <Menu.Item>
                     {({ active }) => (
                       <a
-                        onClick={() => navigate("/manageacc")} // Navigate to Settings
-                        className={`block px-4 py-2 ${
-                          active ? "bg-gray-300" : ""
+                        onClick={() => navigate("/manageacc")}
+                        className={`block px-4 py-2 text-white cursor-pointer ${
+                          active ? "bg-gray-600" : ""
                         }`}
                       >
                         Manage Account
@@ -72,9 +70,9 @@ const Header = () => {
                     {({ active }) => (
                       <a
                         href="#"
-                        onClick={openModal} // Open modal on click
-                        className={`block px-4 py-2 ${
-                          active ? "bg-gray-300" : ""
+                        onClick={openModal}
+                        className={`block px-4 py-2 text-white cursor-pointer ${
+                          active ? "bg-gray-600" : ""
                         }`}
                       >
                         Logout
@@ -90,7 +88,7 @@ const Header = () => {
 
       {/* Confirmation Modal */}
       <Transition appear show={isModalOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className="relative z-50" onClose={closeModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"

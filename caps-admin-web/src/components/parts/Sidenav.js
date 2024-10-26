@@ -20,8 +20,8 @@ const Sidenav = () => {
   const menuItems = [
     { path: "/dashboard", label: "Dashboard" },
     { path: "/riderslist", label: "Manage Riders", parent: "Riders" },
+    { path: "/riderspayment", label: "Rider Payment", parent: "Riders" },
     { path: "/ridersapplicant", label: "Rider Applications", parent: "Riders" },
-    { path: "/riderspayment", label: "Rider Payment", parent: "RidersPayment" },
     { path: "/manageuser", label: "Manage Users" },
     { path: "/manageadmin", label: "Manage Admin", role: 1 },
     { path: "/bookinghistory", label: "Booking History" },

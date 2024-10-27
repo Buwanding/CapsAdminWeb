@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "animate.css": "^4.1.1",
     "axios": "^1.7.2",
     "laravel-echo": "^1.16.1",
     "pusher": "^5.2.0",

@@ -76,7 +76,7 @@ export const Feedback = () => {
                 <div className="p-4 text-center">Loading...</div>
               ) : (
                 <>
-                  <table className="w-full bg-gray-100 rounded-lg shadow">
+                  <table className="animate__animated animate__fadeIn w-full bg-gray-100 rounded-lg shadow">
                     <thead>
                       <tr className="bg-gray-200">
                         <th className="p-4 text-left">Sender</th>

@@ -93,7 +93,7 @@ export const Dashboard = () => {
         <main className="flex-grow p-4 bg-gray-100 overflow-hidden">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <div className="bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
+            <div className="animate__animated animate__fadeIn bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
               <h2 className="text-xl font-bold text-white mb-2">
                 Active Riders
               </h2>
@@ -102,7 +102,7 @@ export const Dashboard = () => {
               </p>
               <p className="text-white text-opacity-90">Total Active Riders</p>
             </div>
-            <div className="bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
+            <div className="animate__animated animate__fadeIn bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
               <h2 className="text-xl font-bold text-white mb-2">
                 Disabled Riders
               </h2>
@@ -113,7 +113,7 @@ export const Dashboard = () => {
                 Total Disabled Riders
               </p>
             </div>
-            <div className="bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
+            <div className="animate__animated animate__fadeIn bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
               <h2 className="text-xl font-bold text-white mb-2">Customers</h2>
               <p className="text-4xl font-bold text-white mb-2">
                 {counts.customers}
@@ -122,7 +122,7 @@ export const Dashboard = () => {
                 Total Number of Customers
               </p>
             </div>
-            <div className="bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
+            <div className="animate__animated animate__fadeIn bg-yellow-500 p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200">
               <h2 className="text-xl font-bold text-white mb-2">
                 Completed Rides
               </h2>
@@ -137,7 +137,7 @@ export const Dashboard = () => {
 
           {/* Performance Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="animate__animated animate__fadeIn bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
                 Earnings Overview
                 <button
@@ -166,7 +166,7 @@ export const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="animate__animated animate__fadeIn bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-xl font-bold mb-4">Ride Statistics</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded-lg">

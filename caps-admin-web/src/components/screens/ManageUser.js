@@ -3,6 +3,7 @@ import Sidenav from "../parts/Sidenav";
 import Header from "../parts/Header";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import userService from "../../services";
+import swal from 'sweetalert2';
 
 const UserCard = ({ customer, handleStatusChange, loading, openModal }) => {
   return (
@@ -107,15 +108,26 @@ export const ManageUser = () => {
     try {
       setLoading(true);
       const newStatus = customer.status === "Active" ? "Disabled" : "Active";
-      await userService.updateUserStatus(customer.user_id, newStatus);
+      const response = await userService.updateUserStatus(customer.user_id, newStatus);
+  
+      // Update the customer object with the new status
       customer.status = newStatus;
       setFilteredCustomers([...filteredCustomers]);
-      setLoading(false);
+  
+      // Display success alert with first and last name
+      const { first_name, last_name } = response.user;
+      swal.fire({
+        title: `Customer ${first_name} ${last_name} Status Successfully Updated`,
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      console.error(
-        `Error updating user status for user ${customer.user_id}:`,
-        error
-      );
+      console.error(`Error updating user status for user ${customer.user_id}:`, error);
+    } finally {
       setLoading(false);
     }
   };
@@ -177,7 +189,7 @@ export const ManageUser = () => {
                   </button>
                 </div>
               </div>
-              <table className="min-w-full bg-white table-auto">
+              <table className="animate__animated animate__fadeIn min-w-full bg-white table-auto">
                 <thead>
                   <tr>
                     <th className="py-2 px-4 border-b border-gray-200 text-left">

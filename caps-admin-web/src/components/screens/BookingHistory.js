@@ -141,7 +141,7 @@ export const BookingHistory = () => {
                 <div className="p-4 text-center">Loading...</div>
               ) : (
                 <>
-                  <table className="min-w-full bg-white">
+                  <table className="animate__animated animate__fadeIn min-w-full bg-white">
                     <thead>
                       <tr>
                         <th className="py-2 px-4 border-b border-gray-200 text-left">Ride ID</th>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
+import swal from "sweetalert2";
 
 const RidersList = () => {
   const [riders, setRiders] = useState([]);
@@ -26,7 +27,7 @@ const RidersList = () => {
         console.error("There was an error fetching the riders!", error);
       }
     };
-  
+
     fetchRiders();
   }, []);
 
@@ -82,11 +83,27 @@ const RidersList = () => {
   const handleActivateRiders = async () => {
     setLoadingActivate(true);
     try {
-      await Promise.all(
+      const responses = await Promise.all(
         selectedRiders.map((riderId) =>
           userService.updateUserStatus(riderId, "Active")
         )
       );
+
+      // Display alerts for each successfully updated rider
+      responses.forEach((response) => {
+        const { first_name, last_name } = response.user;
+        swal.fire({
+          title: `${first_name} ${last_name} status updated successfully`,
+          icon: "success",
+          toast: true,
+          timer: 3000,
+          position: "top-right",
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      });
+
+      // Update the rider statuses in state
       setRiders((prevRiders) =>
         prevRiders.map((rider) =>
           selectedRiders.includes(rider.user_id)
@@ -94,6 +111,7 @@ const RidersList = () => {
             : rider
         )
       );
+
       setSelectedRiders([]);
     } catch (error) {
       console.error("Error activating riders:", error);
@@ -105,11 +123,24 @@ const RidersList = () => {
   const handleDisableRiders = async () => {
     setLoadingDisable(true);
     try {
-      await Promise.all(
+      const responses = await Promise.all(
         selectedRiders.map((riderId) =>
           userService.updateUserStatus(riderId, "Disabled")
         )
       );
+
+      responses.forEach((response) => {
+        const { first_name, last_name } = response.user;
+        swal.fire({
+          title: `${first_name} ${last_name} status updated successfully`,
+          icon: "success",
+          toast: true,
+          timer: 3000,
+          position: "top-right",
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      });
       setRiders((prevRiders) =>
         prevRiders.map((rider) =>
           selectedRiders.includes(rider.user_id)
@@ -178,7 +209,7 @@ const RidersList = () => {
                   </button>
                 </div>
               </div>
-              <table className="w-full text-left table-auto">
+              <table className="animate__animated animate__fadeIn w-full text-left table-auto">
                 <thead>
                   <tr>
                     <th className="px-4 py-2">
@@ -247,19 +278,16 @@ const RidersList = () => {
                           : "No License Expiration Date"}
                       </td>
                       <td>
-                      {rider.rider?.requirement_photos?.length > 0
+                        {rider.rider?.requirement_photos?.length > 0
                           ? rider.rider.requirement_photos
                               .filter((photo) => photo.requirement_id === 3)
                               .map((photo, index) => (
                                 <span key={index}>{photo.photo_url}</span>
                               ))
                           : "No OR Expiration Date"}
-                       
                       </td>
                       <td>
-                      <span>
-                        Paid
-                       </span>
+                        <span>Paid</span>
                       </td>
                       <td className="px-4 py-2">
                         <button

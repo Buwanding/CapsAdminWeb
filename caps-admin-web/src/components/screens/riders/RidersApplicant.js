@@ -6,6 +6,7 @@ import userService from "../../../services";
 import { img_url } from "../../../api_url";
 import defaultProfileLogo from "../../pictures/avatar.png";
 import { X, Loader } from "react-feather";
+import swal from "sweetalert2";
 
 // UserCard component
 const UserCard = ({ rider, onMoreInfo }) => {
@@ -286,12 +287,12 @@ export const RidersApplicant = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const sortRiders = (ridersList) => {
-      const order = { Pending: 0, Verified: 1, Unverified: 2 };
-      return ridersList.sort(
-        (a, b) => order[a.verification_status] - order[b.verification_status]
-      );
-    };
+  const sortRiders = (ridersList) => {
+    const order = { Pending: 0, Verified: 1, Unverified: 2 };
+    return ridersList.sort(
+      (a, b) => order[a.verification_status] - order[b.verification_status]
+    );
+  };
 
   useEffect(() => {
     const filtered = riders.filter((rider) =>
@@ -307,7 +308,6 @@ export const RidersApplicant = () => {
   const clearSearch = () => {
     setSearchInput("");
   };
-
 
   const handleStatusChange = async (userId, newStatus) => {
     setRiders((prevRiders) => {
@@ -360,6 +360,16 @@ export const RidersApplicant = () => {
       );
 
       if (response) {
+        swal.fire({
+          title: "User Status Successfully Updated",
+          icon: "success",
+          toast: true,
+          timer: 3000,
+          position: "top-right",
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+
         await handleStatusChange(
           verificationData.userId,
           verificationData.newStatus
@@ -367,6 +377,16 @@ export const RidersApplicant = () => {
       }
     } catch (error) {
       console.error("Error updating verification status:", error);
+
+      swal.fire({
+        title: "Error updating verification status",
+        icon: "error",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     } finally {
       setIsLoading(false);
       setIsModalOpen(false);
@@ -379,7 +399,7 @@ export const RidersApplicant = () => {
       <div className="flex flex-col min-h-screen">
         <div className="flex flex-grow">
           <Sidenav />
-          <div className="flex flex-col w-full">
+          <div className=" flex flex-col w-full">
             <Header />
             <main className="flex-grow p-4 bg-gray-100 overflow-auto">
               <div className="flex justify-between items-center mb-2">
@@ -392,7 +412,7 @@ export const RidersApplicant = () => {
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
               </div>
-              <div className="p-2">
+              <div className="animate__animated animate__fadeIn p-2">
                 {currentRiders.map((rider, index) => (
                   <UserCard
                     key={index}

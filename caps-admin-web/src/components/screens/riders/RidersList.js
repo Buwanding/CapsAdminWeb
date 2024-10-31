@@ -15,16 +15,20 @@ const RidersList = () => {
   const [modalInfo, setModalInfo] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRiders = async () => {
       try {
+        setLoading(true);
         const data = await userService.fetchRiders();
         console.log("Fetched Riders Data:", data); // Log fetched data to the console
         setRiders(data);
         setFilteredRiders(data);
       } catch (error) {
         console.error("There was an error fetching the riders!", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -209,6 +213,30 @@ const RidersList = () => {
                   </button>
                 </div>
               </div>
+              {loading ? (
+                <div className="flex justify-center items-center py-10">
+                  <svg
+                    className="animate-spin h-10 w-10 text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
+              ) : (
               <table className="animate__animated animate__fadeIn w-full text-left table-auto">
                 <thead>
                   <tr>
@@ -269,7 +297,7 @@ const RidersList = () => {
                       <td>
                         {rider.rider?.requirement_photos?.length > 0
                           ? rider.rider.requirement_photos
-                              .filter((photo) => photo.requirement_id === 7)
+                              .filter((photo) => photo.requirement_id === 6)
                               .map((photo, index) => (
                                 <>
                                   <span key={index}>{photo.photo_url}</span>
@@ -300,7 +328,7 @@ const RidersList = () => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table>)}
               <div className="mt-6 flex items-center space-x-4">
                 <button
                   className={`${

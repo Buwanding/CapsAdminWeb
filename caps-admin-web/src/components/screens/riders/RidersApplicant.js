@@ -38,9 +38,7 @@ const UserCard = ({ rider, onMoreInfo }) => {
         <div className="ml-4">
           <p className="font-bold">{user.first_name}</p>
           <p className="text-gray-600">@{user.user_name}</p>
-          <p className="text-xs">
-            <span className={statusColor}>{verification_status}</span>
-          </p>
+          <p className="text-xs"><span className={statusColor}>{verification_status}</span></p>
         </div>
         <div className="ml-auto">
           <button
@@ -77,14 +75,13 @@ const Modal = ({
     1: "Motorcycle Picture",
     2: "ROCR",
     3: "OR Expiration Date",
-    4: "COR",
-    5: "Drivers License",
-    6: "Drivers License Number",
-    7: "License Expiration Date",
-    8: "TPL Insurance",
-    9: "Barangay Clearance",
-    10: "Police Clearance",
-    11: "Plate Number",
+    4: "Drivers License",
+    5: "Drivers License Number",
+    6: "License Expiration Date",
+    7: "TPL Insurance",
+    8: "Barangay Clearance",
+    9: "Police Clearance",
+    10: "Plate Number",
   };
 
   const getStatusColor = (status) => {
@@ -113,8 +110,8 @@ const Modal = ({
 
   const renderRequirement = (photo) => {
     const fullUrl = `${BASE_URL}${photo.photo_url}`;
-    const isTextRequirement = [3, 6, 7, 11].includes(photo.requirement_id);
-
+    const isTextRequirement = [3, 5, 6, 10].includes(photo.requirement_id);
+    
     const handleImageClick = () => {
       if (!isTextRequirement) {
         setSelectedImage(fullUrl);
@@ -124,18 +121,18 @@ const Modal = ({
     return (
       <div
         key={photo.requirement_id}
-        className="bg-gray-200 p-4 rounded text-center"
+        className="bg-gray-200 p-4 rounded text-center h-full"
       >
-        <p className="text-gray-700">
+        <p className="text-gray-700 font-medium mb-2">
           {requirementMapping[photo.requirement_id]}
         </p>
         {isTextRequirement ? (
-          <p className="mt-2 text-lg font-semibold">{photo.photo_url}</p>
+          <p className="mt-2 text-lg font-semibold break-all">{photo.photo_url}</p>
         ) : (
           <img
             src={fullUrl}
             alt={requirementMapping[photo.requirement_id]}
-            className="w-full h-auto rounded cursor-pointer"
+            className="w-full h-48 object-cover rounded cursor-pointer"
             onClick={handleImageClick}
           />
         )}
@@ -147,16 +144,16 @@ const Modal = ({
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-40">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full relative">
-        <div className="flex flex-col md:flex-row items-center md:items-start">
-          <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-7xl max-h-[90vh] overflow-y-auto relative">
+        <div className="flex flex-col md:flex-row items-center md:items-start space-x-6">
+          <div className="flex-shrink-0 mb-4 md:mb-0">
             <img
               src={user.avatar || defaultProfileLogo}
               alt="Avatar"
-              className="h-32 w-32 rounded-full mx-auto"
+              className="h-32 w-32 rounded-full"
             />
           </div>
-          <div className="text-center md:text-left flex-grow">
+          <div className="flex-grow">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-3xl font-bold">
                 {user.first_name} {user.last_name}
@@ -179,12 +176,15 @@ const Modal = ({
             <p className="text-xs">
               <span className={statusColor}>{verification_status}</span>
             </p>
-            <p className="text-gray-600 text-lg mb-1">{user.user_name}</p>
+            <p className="text-gray-600 text-lg mb-1">@{user.user_name}</p>
             <p className="text-gray-600 text-lg mb-1">{user.mobile_number}</p>
             <p className="text-gray-600 text-lg mb-1">{user.email}</p>
-            <h3 className="text-xl font-semibold mb-2">Requirements</h3>
-            <div className="max-h-60 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-4">Requirements</h3>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 {requirementphotos && requirementphotos.length > 0 ? (
                   requirementphotos.map(renderRequirement)
                 ) : (
@@ -192,19 +192,20 @@ const Modal = ({
                 )}
               </div>
             </div>
-          </div>
-        </div>
+
+        <div className="mt-6 flex justify-end">
         <button
           onClick={onClose}
-          className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-300 transition-colors"
+            className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
         >
           Close
         </button>
+        </div>
       </div>
 
       {selectedImage && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-lg w-full relative">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-4xl w-full relative">
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute top-2 right-2 text-red-600 hover:text-red-800 transition-colors"
@@ -227,65 +228,32 @@ const Modal = ({
 export const RidersApplicant = () => {
   const [riders, setRiders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(5);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [filteredRiders, setFilteredRiders] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [verificationData, setVerificationData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const calculateItemsPerPage = () => {
-    const headerHeight = document.querySelector("header").offsetHeight || 64; // Use default if not found
-    const footerHeight = document.querySelector("footer").offsetHeight || 48; // Use default if not found
-    const cardHeight = 50; // Average height of a UserCard
-    const padding = 20; // Extra padding
-
-    const availableHeight =
-      window.innerHeight - (headerHeight + footerHeight + padding);
-    return Math.max(1, Math.floor(availableHeight / cardHeight));
-  };
-
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerPage(calculateItemsPerPage());
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRiders = async () => {
+      setLoading(true); // Set loading to true before fetching
       try {
         const data = await userService.fetchRequirements();
-        setRiders(data);
-        setFilteredRiders(data);
+        const sortedData = sortRiders(data);
+        setRiders(sortedData);
+        setFilteredRiders(sortedData);
       } catch (error) {
         console.error("Error fetching riders:", error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
       }
     };
 
     fetchRiders();
   }, []);
-
-  useEffect(() => {
-    const filtered = riders.filter((rider) =>
-      `${rider.user.first_name} ${rider.user.last_name} ${rider.user.user_name}`
-        .toLowerCase()
-        .includes(searchInput.toLowerCase())
-    );
-    setFilteredRiders(filtered);
-    setCurrentPage(1);
-  }, [searchInput, riders]);
-
-  const totalPages = Math.ceil(filteredRiders.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentRiders = filteredRiders.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const sortRiders = (ridersList) => {
     const order = { Pending: 0, Verified: 1, Unverified: 2 };
@@ -309,6 +277,19 @@ export const RidersApplicant = () => {
     setSearchInput("");
   };
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRiders = filteredRiders.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.ceil(filteredRiders.length / itemsPerPage);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
   const handleStatusChange = async (userId, newStatus) => {
     setRiders((prevRiders) => {
       const updatedRiders = prevRiders.map((rider) =>
@@ -319,8 +300,8 @@ export const RidersApplicant = () => {
       return sortRiders(updatedRiders);
     });
 
-    setFilteredRiders((prevFilteredRiders) => {
-      const updatedFilteredRiders = prevFilteredRiders.map((rider) =>
+    setFilteredRiders(prevFilteredRiders => {
+      const updatedFilteredRiders = prevFilteredRiders.map(rider =>
         rider.user.user_id === userId
           ? { ...rider, verification_status: newStatus }
           : rider
@@ -328,11 +309,11 @@ export const RidersApplicant = () => {
       return sortRiders(updatedFilteredRiders);
     });
 
-    setSelectedUser((prev) => {
+    setSelectedUser(prev => {
       if (prev && prev.user.user_id === userId) {
         return {
           ...prev,
-          verification_status: newStatus,
+          verification_status: newStatus
         };
       }
       return prev;
@@ -344,21 +325,21 @@ export const RidersApplicant = () => {
     setVerificationData({
       userId,
       currentStatus,
-      newStatus,
+      newStatus
     });
     setIsModalOpen(true);
   };
 
   const handleVerificationConfirm = async () => {
     if (!verificationData) return;
-
+    
     setIsLoading(true);
     try {
       const response = await userService.verifyRider(
         verificationData.userId,
         verificationData.newStatus
       );
-
+      
       if (response) {
         swal.fire({
           title: "User Status Successfully Updated",
@@ -401,72 +382,95 @@ export const RidersApplicant = () => {
           <Sidenav />
           <div className=" flex flex-col w-full">
             <Header />
-            <main className="flex-grow p-4 bg-gray-100 overflow-auto">
+              <main className="flex-grow p-4 bg-gray-100 overflow-auto">
               <div className="flex justify-between items-center mb-2">
                 <h1 className="text-2xl font-bold">Rider Requirements</h1>
-                <input
-                  type="text"
-                  placeholder="Search Name or Username"
-                  className="px-4 py-2 border rounded-lg"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Search Name or Username"
+                    className="px-7 py-2 border rounded-lg"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <button
+                    className="px-4 py-2 bg-gray-200 rounded-lg"
+                    onClick={clearSearch}
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
-              <div className="animate__animated animate__fadeIn p-2">
+              {loading ? (
+                <div className="flex justify-center items-center py-10">
+                  <svg
+                    className="animate-spin h-10 w-10 text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
+              ) : (
+              <div className="p-2">
                 {currentRiders.map((rider, index) => (
                   <UserCard
                     key={index}
                     rider={rider}
-                    onMoreInfo={() => setSelectedUser(rider)}
+                    onMoreInfo={() => setSelectedUser({ 
+                      verification_status: rider.verification_status, 
+                      user: rider.user, 
+                      requirementphotos: rider.requirementphotos 
+                    })}
                   />
                 ))}
               </div>
+              )}
             </main>
+              
             <footer className="bg-white p-2 shadow-md">
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`bg-gray-300 px-2 py-1 rounded ${
-                    currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
-                  }`}
-                >
-                  Previous
-                </button>
-                <div className="flex gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => paginate(i + 1)}
-                      className={`px-2 py-1 rounded ${
-                        i + 1 === currentPage
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-gray-300"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`bg-gray-300 px-2 py-1 rounded ${
-                    currentPage === totalPages
-                      ? "cursor-not-allowed opacity-50"
-                      : ""
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            </footer>
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
+                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Prev
+            </button>
+            <span className="text-gray-600 text-sm font-bold">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
+                currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </footer>
           </div>
         </div>
-        {/* Modal component for selected user */}
         {selectedUser && (
-          <Modal
-            user={selectedUser.user}
+          <Modal 
+            user={selectedUser.user} 
             requirementphotos={selectedUser.requirementphotos}
             verification_status={selectedUser.verification_status}
             onClose={() => setSelectedUser(null)}
@@ -474,86 +478,81 @@ export const RidersApplicant = () => {
             onVerifyClick={handleVerifyClick}
           />
         )}
-        {/* Confirmation Modal */}
-        <Transition.Root show={isModalOpen} as={Fragment}>
-          <Dialog
-            as="div"
-            className="relative z-50"
-            onClose={() => setIsModalOpen(false)}
+    </div>
+{/* Confirmation Modal */}
+<Transition.Root show={isModalOpen} as={Fragment}>
+        <Dialog 
+          as="div" 
+          className="relative z-50"
+          onClose={() => setIsModalOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
-            </Transition.Child>
-            <div className="fixed inset-0 z-50 overflow-y-auto">
-              <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                <Transition.Child
-                  as={Fragment}
-                  enter="ease-out duration-300"
-                  enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                  enterTo="opacity-100 translate-y-0 sm:scale-100"
-                  leave="ease-in duration-200"
-                  leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                  leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                  <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                    <div>
-                      <div className="mt-3 text-center sm:mt-5">
-                        <Dialog.Title
-                          as="h3"
-                          className="text-lg font-semibold leading-6 text-gray-900"
-                        >
-                          Confirm{" "}
-                          {verificationData?.newStatus === "Verified"
-                            ? "Verification"
-                            : "Unverification"}
-                        </Dialog.Title>
-                        <div className="mt-2">
-                          <p className="text-sm text-gray-500">
-                            Are you sure you want to{" "}
-                            {verificationData?.newStatus === "Verified"
-                              ? "verify"
-                              : "unverify"}{" "}
-                            this rider? This action cannot be undone.
-                          </p>
-                        </div>
+            <div className="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-semibold leading-6 text-gray-900"
+                      >
+                        Confirm {verificationData?.newStatus === "Verified" ? "Verification" : "Unverification"}
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Are you sure you want to {verificationData?.newStatus === "Verified" ? "verify" : "unverify"} this rider?
+
+                        </p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                      <button
-                        type="button"
-                        className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:col-start-2"
-                        onClick={handleVerificationConfirm}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <Loader className="animate-spin mr-2" size={16} />
-                        ) : null}
-                        Confirm
-                      </button>
-                      <button
-                        type="button"
-                        className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
-                        onClick={() => setIsModalOpen(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </Dialog.Panel>
-                </Transition.Child>
-              </div>
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:col-start-2"
+                      onClick={handleVerificationConfirm}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader className="animate-spin mr-2" size={16} />
+                      ) : null}
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
-          </Dialog>
-        </Transition.Root>
-      </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </>
   );
 };

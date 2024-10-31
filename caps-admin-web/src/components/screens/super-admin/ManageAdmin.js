@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
-import AddAdminForm from "./AddAdminForm"; // Import the AddAdminForm component
+import AddAdminForm from "./AddAdminForm";
 
 const UserCard = ({ admin, onStatusChange, onEdit }) => {
   const [loading, setLoading] = useState(false);
@@ -54,42 +54,39 @@ const UserCard = ({ admin, onStatusChange, onEdit }) => {
 
 const ManageAdmin = () => {
   const [showForm, setShowForm] = useState(false);
-  const [admin, setAdmin] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [editingAdminId, setEditingAdminId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState(null);
 
   const handleSuccess = (message) => {
-    
     setSuccessMessage(message);
     fetchAdmins(); // Refresh the admin list
+
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 3000);
   };
-  
-
-  useEffect(() => {
-    const fetchAdmin = async () => {
-      try {
-        const data = await userService.fetchAdmin();
-        setAdmin(data);
-      } catch (error) {
-        console.error("There was an error fetching the Admins!", error);
-      }
-    };
-
-    fetchAdmin();
-  }, []);
 
   const fetchAdmins = async () => {
     try {
+      setLoading(true);
       const adminList = await userService.fetchAdmin();
-      setAdmin(adminList);
+      setAdmins(adminList);
     } catch (error) {
       console.error("Error fetching admins:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
   const handleStatusChange = (userId, newStatus) => {
-    setAdmin((prevAdmin) =>
-      prevAdmin.map((admin) =>
+    setAdmins((prevAdmins) =>
+      prevAdmins.map((admin) =>
         admin.user_id === userId ? { ...admin, status: newStatus } : admin
       )
     );
@@ -97,7 +94,6 @@ const ManageAdmin = () => {
 
   const handleEdit = (userId) => {
     setEditingAdminId(userId);
-    console.log("ID PINAKAUNA: " + editingAdminId);
     setShowForm(true);
   };
 
@@ -115,11 +111,7 @@ const ManageAdmin = () => {
           <div className="flex">
             <div className="flex-1">
               <header className="bg-black text-white flex items-center justify-between p-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-white-500 font-bold text-xl">
-                    Admin Users
-                  </span>
-                </div>
+                <h1 className="font-bold text-xl">Admin Users</h1>
                 <button
                   className="bg-blue-500 text-white py-2 px-4 rounded"
                   onClick={handleAddNew}
@@ -132,24 +124,28 @@ const ManageAdmin = () => {
                 {showForm && (
                   <AddAdminForm
                     setShowForm={setShowForm}
-                    setAdmin={setAdmin}
+                    setAdmins={setAdmins}
                     editingAdminId={editingAdminId}
-                    editingAdmin={admin.find(
-                      (a) => a.user_id === editingAdminId
-                    )}
+                    editingAdmin={admins.find((a) => a.user_id === editingAdminId)}
                     onSuccess={handleSuccess}
                   />
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  {admin.map((adminUser) => (
-                    <UserCard
-                      key={adminUser.user_id}
-                      admin={adminUser}
-                      onStatusChange={handleStatusChange}
-                      onEdit={handleEdit}
-                    />
-                  ))}
-                </div>
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="loader">Loading...</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    {admins.map((adminUser) => (
+                      <UserCard
+                        key={adminUser.user_id}
+                        admin={adminUser}
+                        onStatusChange={handleStatusChange}
+                        onEdit={handleEdit}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

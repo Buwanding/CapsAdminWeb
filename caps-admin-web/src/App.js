@@ -24,6 +24,7 @@ import Sidenav from './components/parts/Sidenav';
 import Settings from "./components/Settings";
 import ManageAccount from "./components/ManageAccount";
 import RidersPayment from "./components/screens/riders/RidersPayment";
+import RidersLocation from "./components/screens/riders/RidersLocation";
 const AxiosInterceptor = ({ children }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -89,6 +90,7 @@ function AppContent() {
             <Route path="/manageuser" element={<ManageUser />} />
             <Route path="/manageadmin" element={<ManageAdmin />} />
             <Route path="/bookinghistory" element={<BookingHistory />} />
+            <Route path="/riderslocation" element={<RidersLocation />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/manageacc" element={<ManageAccount />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

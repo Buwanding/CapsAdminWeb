@@ -22,6 +22,7 @@ const Sidenav = () => {
     { path: "/riderslist", label: "Manage Riders", parent: "Riders" },
     { path: "/riderspayment", label: "Rider Payment", parent: "Riders" },
     { path: "/ridersapplicant", label: "Rider Applications", parent: "Riders" },
+    { path: "/riderslocation", label: "Rider Location", parent: "Riders" },
     { path: "/manageuser", label: "Manage Users" },
     { path: "/manageadmin", label: "Manage Admin", role: 1 },
     { path: "/bookinghistory", label: "Booking History" },
@@ -82,6 +83,24 @@ const Sidenav = () => {
               <Disclosure.Panel className="bg-gray-800 text-white">
                 {menuItems
                   .filter((item) => item.parent === "RidersPayment")
+                  .map((child, childIndex) => (
+                    <button
+                      key={childIndex}
+                      onClick={() => handleClick(child.path)}
+                      className={`block w-full text-left px-4 py-2 ${
+                        isActive(child.path)
+                          ? "bg-yellow-600 text-white cursor-not-allowed"
+                          : "hover:bg-gray-700"
+                      }`}
+                      disabled={isActive(child.path)}
+                    >
+                      {child.label}
+                    </button>
+                  ))}
+              </Disclosure.Panel>
+              <Disclosure.Panel className="bg-gray-800 text-white">
+                {menuItems
+                  .filter((item) => item.parent === "RidersLocation")
                   .map((child, childIndex) => (
                     <button
                       key={childIndex}

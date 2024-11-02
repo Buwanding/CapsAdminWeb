@@ -48,7 +48,7 @@ const RidersPayment = () => {
           <Header />
           <main className="flex-grow p-6 bg-gray-50">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Rider Payments</h1>
+              <h1 className="text-2xl font-bold">Riders Payments</h1>
               <button
                 onClick={() => {
                   setIsModalOpen(true);
@@ -77,7 +77,7 @@ const RidersPayment = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Rider Name
+                      Riders Name
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Amount
@@ -156,7 +156,7 @@ const RidersPayment = () => {
                       {/* Form Fields for Record Payment */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Rider Name
+                          Riders Name
                         </label>
                         <input
                           type="text"

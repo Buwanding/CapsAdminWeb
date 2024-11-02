@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import Sidenav from "../parts/Sidenav";
 import Header from "../parts/Header";
-import { ChevronDownIcon } from "@heroicons/react/solid";
 import userService from "../../services";
-import swal from 'sweetalert2';
+import swal from "sweetalert2";
 
-const UserCard = ({ customer, handleStatusChange, loadingUserId, openModal }) => {
+const UserCard = ({
+  customer,
+  handleStatusChangeClick,
+  loadingUserId,
+  openModal,
+}) => {
   const isLoading = loadingUserId === customer.user_id;
-  
+
   return (
     <tr key={customer.user_id}>
       <td className="py-0.5 px-4">
@@ -28,7 +33,7 @@ const UserCard = ({ customer, handleStatusChange, loadingUserId, openModal }) =>
           className={`${
             customer.status === "Active" ? "bg-red-500" : "bg-green-500"
           } text-white px-2 py-1 rounded`}
-          onClick={() => handleStatusChange(customer)}
+          onClick={() => handleStatusChangeClick(customer)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -79,9 +84,17 @@ export const ManageUser = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
-  const [loadingUserId, setLoadingUserId] = useState(null); // Track loading for each user
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [loadingUserId, setLoadingUserId] = useState(null);
+  const [infoModal, setInfoModal] = useState({
+    isOpen: false,
+    customer: null,
+  });
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    customerToUpdate: null,
+  });
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -110,15 +123,35 @@ export const ManageUser = () => {
     setCurrentPage(1);
   };
 
-  const handleStatusChange = async (customer) => {
+  const handleStatusChangeClick = (customer) => {
+    const newStatus = customer.status === "Active" ? "Disabled" : "Active";
+    setConfirmationModal({
+      isOpen: true,
+      title: `${newStatus === "Active" ? "Enable" : "Disable"} User`,
+      message: `Are you sure you want to ${
+        newStatus === "Active" ? "enable" : "disable"
+      } ${customer.first_name} ${customer.last_name}?`,
+      customerToUpdate: customer,
+    });
+  };
+
+  const handleConfirmStatusChange = async () => {
+    const customer = confirmationModal.customerToUpdate;
+    if (!customer) return;
+
     try {
       setLoadingUserId(customer.user_id);
       const newStatus = customer.status === "Active" ? "Disabled" : "Active";
-      const response = await userService.updateUserStatus(customer.user_id, newStatus);
-  
-      customer.status = newStatus;
-      setFilteredCustomers([...filteredCustomers]);
-  
+      const response = await userService.updateUserStatus(
+        customer.user_id,
+        newStatus
+      );
+
+      const updatedCustomers = filteredCustomers.map((c) =>
+        c.user_id === customer.user_id ? { ...c, status: newStatus } : c
+      );
+      setFilteredCustomers(updatedCustomers);
+
       const { first_name, last_name } = response.user;
       swal.fire({
         title: `Customer ${first_name} ${last_name} Status Successfully Updated`,
@@ -130,20 +163,21 @@ export const ManageUser = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error(`Error updating user status for user ${customer.user_id}:`, error);
+      console.error(
+        `Error updating user status for user ${customer.user_id}:`,
+        error
+      );
     } finally {
       setLoadingUserId(null);
+      setConfirmationModal({ ...confirmationModal, isOpen: false });
     }
   };
 
   const openModal = (customer) => {
-    setSelectedCustomer(customer);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedCustomer(null);
+    setInfoModal({
+      isOpen: true,
+      customer,
+    });
   };
 
   const indexOfLastCustomer = currentPage * customersPerPage;
@@ -216,13 +250,15 @@ export const ManageUser = () => {
                       <th className="py-2 px-4 border-b border-gray-200 text-left">
                         Customer Name
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2 text-center ">
+                      <th className="px-4 border-b border-gray-200 py-2 text-center">
                         Status
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2 text-right ">
+                      <th className="px-4 border-b border-gray-200 py-2 text-right">
                         Action
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2 ">More</th>
+                      <th className="px-4 border-b border-gray-200 py-2">
+                        More
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -230,7 +266,7 @@ export const ManageUser = () => {
                       <UserCard
                         key={customer.user_id}
                         customer={customer}
-                        handleStatusChange={handleStatusChange}
+                        handleStatusChangeClick={handleStatusChangeClick}
                         loadingUserId={loadingUserId}
                         openModal={openModal}
                       />
@@ -259,7 +295,9 @@ export const ManageUser = () => {
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
               className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
-                currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                currentPage === totalPages
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               Next
@@ -267,6 +305,83 @@ export const ManageUser = () => {
           </div>
         </footer>
       </div>
+
+      {/* Confirmation Modal */}
+      <Transition.Root show={confirmationModal.isOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() =>
+            setConfirmationModal({ ...confirmationModal, isOpen: false })
+          }
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-semibold leading-6 text-gray-900"
+                      >
+                        {confirmationModal.title}
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          {confirmationModal.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:col-start-2"
+                      onClick={handleConfirmStatusChange}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      onClick={() =>
+                        setConfirmationModal({
+                          ...confirmationModal,
+                          isOpen: false,
+                        })
+                      }
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </div>
   );
 };

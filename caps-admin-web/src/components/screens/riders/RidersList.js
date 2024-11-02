@@ -3,6 +3,9 @@ import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
 import userService from "../../../services";
 import swal from "sweetalert2";
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+
 
 const RidersList = () => {
   const [riders, setRiders] = useState([]);
@@ -16,6 +19,14 @@ const RidersList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  
+
+    const [confirmationModal, setConfirmationModal] = useState({
+      isOpen: false,
+      action: null,
+      title: "",
+      message: "",
+    });
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -84,81 +95,102 @@ const RidersList = () => {
     });
   };
 
-  const handleActivateRiders = async () => {
-    setLoadingActivate(true);
-    try {
-      const responses = await Promise.all(
-        selectedRiders.map((riderId) =>
-          userService.updateUserStatus(riderId, "Active")
-        )
-      );
+ const showConfirmationModal = (action) => {
+   const isActivate = action === "activate";
+   setConfirmationModal({
+     isOpen: true,
+     action: action,
+     title: `Confirm ${isActivate ? "Activation" : "Disable"}`,
+     message: `Are you sure you want to ${
+       isActivate ? "activate" : "disable"
+     } the selected rider${selectedRiders.length > 1 ? "s" : ""}?`,
+   });
+ };
 
-      // Display alerts for each successfully updated rider
-      responses.forEach((response) => {
-        const { first_name, last_name } = response.user;
-        swal.fire({
-          title: `${first_name} ${last_name} status updated successfully`,
-          icon: "success",
-          toast: true,
-          timer: 3000,
-          position: "top-right",
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-      });
+ const handleActivateRiders = async () => {
+   setConfirmationModal({ ...confirmationModal, isOpen: false });
+   setLoadingActivate(true);
+   try {
+     const responses = await Promise.all(
+       selectedRiders.map((riderId) =>
+         userService.updateUserStatus(riderId, "Active")
+       )
+     );
 
-      // Update the rider statuses in state
-      setRiders((prevRiders) =>
-        prevRiders.map((rider) =>
-          selectedRiders.includes(rider.user_id)
-            ? { ...rider, status: "Active" }
-            : rider
-        )
-      );
+     responses.forEach((response) => {
+       const { first_name, last_name } = response.user;
+       swal.fire({
+         title: `${first_name} ${last_name} status updated successfully`,
+         icon: "success",
+         toast: true,
+         timer: 3000,
+         position: "top-right",
+         timerProgressBar: true,
+         showConfirmButton: false,
+       });
+     });
 
-      setSelectedRiders([]);
-    } catch (error) {
-      console.error("Error activating riders:", error);
-    } finally {
-      setLoadingActivate(false);
-    }
-  };
+     setRiders((prevRiders) =>
+       prevRiders.map((rider) =>
+         selectedRiders.includes(rider.user_id)
+           ? { ...rider, status: "Active" }
+           : rider
+       )
+     );
 
-  const handleDisableRiders = async () => {
-    setLoadingDisable(true);
-    try {
-      const responses = await Promise.all(
-        selectedRiders.map((riderId) =>
-          userService.updateUserStatus(riderId, "Disabled")
-        )
-      );
+     setSelectedRiders([]);
+   } catch (error) {
+     console.error("Error activating riders:", error);
+   } finally {
+     setLoadingActivate(false);
+   }
+ };
 
-      responses.forEach((response) => {
-        const { first_name, last_name } = response.user;
-        swal.fire({
-          title: `${first_name} ${last_name} status updated successfully`,
-          icon: "success",
-          toast: true,
-          timer: 3000,
-          position: "top-right",
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-      });
-      setRiders((prevRiders) =>
-        prevRiders.map((rider) =>
-          selectedRiders.includes(rider.user_id)
-            ? { ...rider, status: "Disabled" }
-            : rider
-        )
-      );
-      setSelectedRiders([]);
-    } catch (error) {
-      console.error("Error disabling riders:", error);
-    } finally {
-      setLoadingDisable(false);
-    }
-  };
+ const handleDisableRiders = async () => {
+   setConfirmationModal({ ...confirmationModal, isOpen: false });
+   setLoadingDisable(true);
+   try {
+     const responses = await Promise.all(
+       selectedRiders.map((riderId) =>
+         userService.updateUserStatus(riderId, "Disabled")
+       )
+     );
+
+     responses.forEach((response) => {
+       const { first_name, last_name } = response.user;
+       swal.fire({
+         title: `${first_name} ${last_name} status updated successfully`,
+         icon: "success",
+         toast: true,
+         timer: 3000,
+         position: "top-right",
+         timerProgressBar: true,
+         showConfirmButton: false,
+       });
+     });
+
+     setRiders((prevRiders) =>
+       prevRiders.map((rider) =>
+         selectedRiders.includes(rider.user_id)
+           ? { ...rider, status: "Disabled" }
+           : rider
+       )
+     );
+     setSelectedRiders([]);
+   } catch (error) {
+     console.error("Error disabling riders:", error);
+   } finally {
+     setLoadingDisable(false);
+   }
+ };
+
+ const handleConfirmAction = () => {
+   if (confirmationModal.action === "activate") {
+     handleActivateRiders();
+   } else if (confirmationModal.action === "disable") {
+     handleDisableRiders();
+   }
+ };
 
   const isAnySelectedActive = selectedRiders.some((riderId) => {
     const rider = riders.find((r) => r.user_id === riderId);
@@ -237,98 +269,99 @@ const RidersList = () => {
                   </svg>
                 </div>
               ) : (
-              <table className="animate__animated animate__fadeIn w-full text-left table-auto">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2">
-                      <input
-                        type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedRiders(
-                              riders.map((rider) => rider.user_id)
-                            );
-                          } else {
-                            setSelectedRiders([]);
-                          }
-                        }}
-                        checked={
-                          selectedRiders.length === riders.length &&
-                          riders.length > 0
-                        }
-                      />
-                    </th>
-                    <th className="px-4 py-2">Name</th>
-                    <th className="px-4 py-2">Phone Number</th>
-                    <th className="px-4 py-2">Status</th>
-                    <th className="px-4 py-2">License Expiration</th>
-                    <th className="px-4 py-2">OR Expiration</th>
-                    <th className="px-4 py-2">Paid for weekly</th>
-                    <th className="px-4 py-2">More</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((rider) => (
-                    <tr key={rider.user_id} className="border-t">
-                      <td className="px-4 py-2">
+                <table className="animate__animated animate__fadeIn w-full text-left table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">
                         <input
                           type="checkbox"
-                          checked={selectedRiders.includes(rider.user_id)}
-                          onChange={() => handleSelectRider(rider.user_id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedRiders(
+                                riders.map((rider) => rider.user_id)
+                              );
+                            } else {
+                              setSelectedRiders([]);
+                            }
+                          }}
+                          checked={
+                            selectedRiders.length === riders.length &&
+                            riders.length > 0
+                          }
                         />
-                      </td>
-                      <td className="px-4 py-2">
-                        {rider.first_name} {rider.last_name}
-                      </td>
-                      <td className="px-4 py-2">{rider.mobile_number}</td>
-                      <td className="px-4 py-2">
-                        {rider.status === "Active" ? (
-                          <span className="inline-flex items-center">
-                            <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                            <span>{rider.status}</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center">
-                            <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-                            <span>{rider.status}</span>
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        {rider.rider?.requirement_photos?.length > 0
-                          ? rider.rider.requirement_photos
-                              .filter((photo) => photo.requirement_id === 6)
-                              .map((photo, index) => (
-                                <>
-                                  <span key={index}>{photo.photo_url}</span>
-                                </>
-                              ))
-                          : "No License Expiration Date"}
-                      </td>
-                      <td>
-                        {rider.rider?.requirement_photos?.length > 0
-                          ? rider.rider.requirement_photos
-                              .filter((photo) => photo.requirement_id === 3)
-                              .map((photo, index) => (
-                                <span key={index}>{photo.photo_url}</span>
-                              ))
-                          : "No OR Expiration Date"}
-                      </td>
-                      <td>
-                        <span>Paid</span>
-                      </td>
-                      <td className="px-4 py-2">
-                        <button
-                          className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
-                          onClick={() => openModal(rider.user_id)}
-                        >
-                          Info
-                        </button>
-                      </td>
+                      </th>
+                      <th className="px-4 py-2">Name</th>
+                      <th className="px-4 py-2">Phone Number</th>
+                      <th className="px-4 py-2">Status</th>
+                      <th className="px-4 py-2">License Expiration</th>
+                      <th className="px-4 py-2">OR Expiration</th>
+                      <th className="px-4 py-2">Paid for weekly</th>
+                      <th className="px-4 py-2">More</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>)}
+                  </thead>
+                  <tbody>
+                    {currentItems.map((rider) => (
+                      <tr key={rider.user_id} className="border-t">
+                        <td className="px-4 py-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedRiders.includes(rider.user_id)}
+                            onChange={() => handleSelectRider(rider.user_id)}
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          {rider.first_name} {rider.last_name}
+                        </td>
+                        <td className="px-4 py-2">{rider.mobile_number}</td>
+                        <td className="px-4 py-2">
+                          {rider.status === "Active" ? (
+                            <span className="inline-flex items-center">
+                              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                              <span>{rider.status}</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center">
+                              <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                              <span>{rider.status}</span>
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          {rider.rider?.requirement_photos?.length > 0
+                            ? rider.rider.requirement_photos
+                                .filter((photo) => photo.requirement_id === 6)
+                                .map((photo, index) => (
+                                  <>
+                                    <span key={index}>{photo.photo_url}</span>
+                                  </>
+                                ))
+                            : "No License Expiration Date"}
+                        </td>
+                        <td>
+                          {rider.rider?.requirement_photos?.length > 0
+                            ? rider.rider.requirement_photos
+                                .filter((photo) => photo.requirement_id === 3)
+                                .map((photo, index) => (
+                                  <span key={index}>{photo.photo_url}</span>
+                                ))
+                            : "No OR Expiration Date"}
+                        </td>
+                        <td>
+                          <span>Paid</span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <button
+                            className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-400"
+                            onClick={() => openModal(rider.user_id)}
+                          >
+                            Info
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
               <div className="mt-6 flex items-center space-x-4">
                 <button
                   className={`${
@@ -338,8 +371,12 @@ const RidersList = () => {
                       ? "bg-red-300"
                       : "bg-red-500 hover:bg-red-700"
                   } text-white font-bold py-2 px-4 rounded-full`}
-                  onClick={handleDisableRiders}
-                  disabled={isAnySelectedDisabled || loadingDisable}
+                  onClick={() => showConfirmationModal("disable")}
+                  disabled={
+                    isAnySelectedDisabled ||
+                    loadingDisable ||
+                    selectedRiders.length === 0
+                  }
                 >
                   {loadingDisable ? "Disabling..." : "Disable"}
                 </button>
@@ -351,12 +388,95 @@ const RidersList = () => {
                       ? "bg-green-300"
                       : "bg-green-500 hover:bg-green-700"
                   } text-white font-bold py-2 px-4 rounded-full`}
-                  onClick={handleActivateRiders}
-                  disabled={isAnySelectedActive || loadingActivate}
+                  onClick={() => showConfirmationModal("activate")}
+                  disabled={
+                    isAnySelectedActive ||
+                    loadingActivate ||
+                    selectedRiders.length === 0
+                  }
                 >
                   {loadingActivate ? "Activating..." : "Activate Rider"}
                 </button>
               </div>
+              {/* Add the Confirmation Modal */}
+              <Transition.Root show={confirmationModal.isOpen} as={Fragment}>
+                <Dialog
+                  as="div"
+                  className="relative z-50"
+                  onClose={() =>
+                    setConfirmationModal({
+                      ...confirmationModal,
+                      isOpen: false,
+                    })
+                  }
+                >
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <div className="fixed inset-0 bg-black bg-opacity-30 transition-opacity" />
+                  </Transition.Child>
+
+                  <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        enterTo="opacity-100 translate-y-0 sm:scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                        leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                      >
+                        <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                          <div>
+                            <div className="mt-3 text-center sm:mt-5">
+                              <Dialog.Title
+                                as="h3"
+                                className="text-lg font-semibold leading-6 text-gray-900"
+                              >
+                                {confirmationModal.title}
+                              </Dialog.Title>
+                              <div className="mt-2">
+                                <p className="text-sm text-gray-500">
+                                  {confirmationModal.message}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                            <button
+                              type="button"
+                              className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:col-start-2"
+                              onClick={handleConfirmAction}
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              type="button"
+                              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                              onClick={() =>
+                                setConfirmationModal({
+                                  ...confirmationModal,
+                                  isOpen: false,
+                                })
+                              }
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </Dialog.Panel>
+                      </Transition.Child>
+                    </div>
+                  </div>
+                </Dialog>
+              </Transition.Root>
             </div>
           </main>
           <footer className="bg-white p-2 shadow-md">

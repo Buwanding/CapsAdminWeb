@@ -267,6 +267,30 @@ export const ManageUser = () => {
           </div>
         </footer>
       </div>
+      {/* Modal for User Info */}
+      {showModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded shadow-md w-96">
+            <h2 className="text-xl font-bold mb-4">User Information</h2>
+            <p>
+              <strong>Name:</strong> {selectedCustomer.first_name}{" "}
+              {selectedCustomer.last_name}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedCustomer.status}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedCustomer.email}
+            </p>
+            <button
+              className="bg-gray-700 text-white font-bold py-1 px-3 rounded mt-4"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

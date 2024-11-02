@@ -210,6 +210,18 @@ const userService = {
       throw error;
     }
   },
+
+  fetchLoc: async () => {
+    try {
+      const response = await axios.get(API_URL + "riders/locations");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      throw error;
+    }
+  },
+
+  
 };
 
 export default userService;

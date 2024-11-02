@@ -37,13 +37,30 @@ const icons = {
 // Debug Panel Component
 const DebugPanel = ({ data }) => (
   <div className="absolute top-4 right-4 bg-white p-3 rounded-lg shadow-lg text-sm z-[9999]">
-    <h3 className="font-bold mb-2">Debug Info</h3>
+    <h3 className="font-bold mb-2">Additional Info: </h3>
     <div className="space-y-1">
       <p>Total Riders: {data.totalRiders}</p>
-      <p>Valid Riders: {data.validRiders}</p>
-      <p>Device Location: {JSON.stringify(data.deviceLocation)}</p>
-      <p>Current Center: {JSON.stringify(data.currentCenter)}</p>
-      <p>Map Loaded: {data.mapLoaded ? "Yes" : "No"}</p>
+      <div className="">
+        <h1 className="font-bold mb-2">Icon Legend:</h1>
+        <div className="flex items-center space-x-2 mb-1">
+          <img
+            src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png"
+            alt="Available Riders"
+            height={15}
+            width={15}
+          />
+          <p>Available Riders</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <img
+            src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png"
+            alt="Available Riders"
+            height={15}
+            width={15}
+          />
+          <p>Admin Current Location</p>
+        </div>
+      </div>
     </div>
   </div>
 );

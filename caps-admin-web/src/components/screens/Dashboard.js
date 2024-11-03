@@ -215,7 +215,7 @@ export const Dashboard = () => {
                   Active Admins
                 </h2>
                 <p className="text-4xl font-bold text-white mb-2">
-                  {counts.admincount}
+                {counts.admin_count !== undefined ? counts.admin_count : counts.admincount}
                 </p>
                 <p className="text-white text-opacity-90">
                   Total Active Admins

@@ -196,7 +196,9 @@ export const ManageUser = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Sidenav className="fixed" />
+      <div className="z-[9999]">
+        <Sidenav />
+      </div>
       <div className="flex-grow flex flex-col">
         <Header className="fixed" />
         <main className="flex-grow bg-gray-100">

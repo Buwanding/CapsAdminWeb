@@ -1,12 +1,12 @@
 // src/App.js
-import React, { useEffect } from "react";
-import axios from 'axios';
+import React, { useContext, useEffect } from "react";
+import axios from "axios";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   useNavigate,
-  Navigate
+  Navigate,
 } from "react-router-dom";
 import Login from "./components/screens/Login";
 import { Dashboard } from "./components/screens/Dashboard";
@@ -15,12 +15,12 @@ import RidersList from "./components/screens/riders/RidersList";
 import { ManageUser } from "./components/screens/ManageUser";
 import { BookingHistory } from "./components/screens/BookingHistory";
 import { RidersApplicant } from "./components/screens/riders/RidersApplicant";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthContext, AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import ManageAdmin from "./components/screens/super-admin/ManageAdmin";
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import Sidenav from './components/parts/Sidenav';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import Sidenav from "./components/parts/Sidenav";
 import Settings from "./components/Settings";
 import ManageAccount from "./components/ManageAccount";
 import RidersPayment from "./components/screens/riders/RidersPayment";
@@ -35,7 +35,7 @@ const AxiosInterceptor = ({ children }) => {
       (error) => {
         if (error.response && error.response.status === 401) {
           logout();
-          navigate('/');
+          navigate("/");
         }
         return Promise.reject(error);
       }
@@ -65,22 +65,33 @@ const ProtectedRoute = ({ children }) => {
 
 function AppContent() {
   const { isAuthenticated, loading } = useAuth();
+  const { isSideBarMenuOpen } = useContext(AuthContext);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
-    return <Routes><Route path="*" element={<Login />} /></Routes>;
+    return (
+      <Routes>
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
   }
 
   return (
-    <div className="flex">
-      <Sidenav />
-      <div className="flex-1">
-        <main className="ml-64">
-          {" "}
-          {/* Remove mt-16 and adjust ml-64 if needed */}
+    <div className="flex relative min-h-screen">
+      {" "}
+      {/* Added relative positioning */}
+      <div className="flex-1 relative">
+        {" "}
+        {/* Added relative positioning */}
+        <main
+          className={`
+          w-full transition-[margin] duration-300 ease-in-out
+          ${isSideBarMenuOpen ? "ml-64" : ""}
+        `}
+        >
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/feedback" element={<Feedback />} />

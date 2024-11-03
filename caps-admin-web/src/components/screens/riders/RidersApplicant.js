@@ -38,7 +38,9 @@ const UserCard = ({ rider, onMoreInfo }) => {
         <div className="ml-4">
           <p className="font-bold">{user.first_name}</p>
           <p className="text-gray-600">@{user.user_name}</p>
-          <p className="text-xs"><span className={statusColor}>{verification_status}</span></p>
+          <p className="text-xs">
+            <span className={statusColor}>{verification_status}</span>
+          </p>
         </div>
         <div className="ml-auto">
           <button
@@ -111,7 +113,7 @@ const Modal = ({
   const renderRequirement = (photo) => {
     const fullUrl = `${BASE_URL}${photo.photo_url}`;
     const isTextRequirement = [3, 5, 6, 10].includes(photo.requirement_id);
-    
+
     const handleImageClick = () => {
       if (!isTextRequirement) {
         setSelectedImage(fullUrl);
@@ -127,7 +129,9 @@ const Modal = ({
           {requirementMapping[photo.requirement_id]}
         </p>
         {isTextRequirement ? (
-          <p className="mt-2 text-lg font-semibold break-all">{photo.photo_url}</p>
+          <p className="mt-2 text-lg font-semibold break-all">
+            {photo.photo_url}
+          </p>
         ) : (
           <img
             src={fullUrl}
@@ -185,21 +189,21 @@ const Modal = ({
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-4">Requirements</h3>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {requirementphotos && requirementphotos.length > 0 ? (
-                  requirementphotos.map(renderRequirement)
-                ) : (
-                  <p className="text-gray-600">No requirements available</p>
-                )}
-              </div>
-            </div>
+            {requirementphotos && requirementphotos.length > 0 ? (
+              requirementphotos.map(renderRequirement)
+            ) : (
+              <p className="text-gray-600">No requirements available</p>
+            )}
+          </div>
+        </div>
 
         <div className="mt-6 flex justify-end">
-        <button
-          onClick={onClose}
+          <button
+            onClick={onClose}
             className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors"
-        >
-          Close
-        </button>
+          >
+            Close
+          </button>
         </div>
       </div>
 
@@ -300,8 +304,8 @@ export const RidersApplicant = () => {
       return sortRiders(updatedRiders);
     });
 
-    setFilteredRiders(prevFilteredRiders => {
-      const updatedFilteredRiders = prevFilteredRiders.map(rider =>
+    setFilteredRiders((prevFilteredRiders) => {
+      const updatedFilteredRiders = prevFilteredRiders.map((rider) =>
         rider.user.user_id === userId
           ? { ...rider, verification_status: newStatus }
           : rider
@@ -309,11 +313,11 @@ export const RidersApplicant = () => {
       return sortRiders(updatedFilteredRiders);
     });
 
-    setSelectedUser(prev => {
+    setSelectedUser((prev) => {
       if (prev && prev.user.user_id === userId) {
         return {
           ...prev,
-          verification_status: newStatus
+          verification_status: newStatus,
         };
       }
       return prev;
@@ -325,21 +329,21 @@ export const RidersApplicant = () => {
     setVerificationData({
       userId,
       currentStatus,
-      newStatus
+      newStatus,
     });
     setIsModalOpen(true);
   };
 
   const handleVerificationConfirm = async () => {
     if (!verificationData) return;
-    
+
     setIsLoading(true);
     try {
       const response = await userService.verifyRider(
         verificationData.userId,
         verificationData.newStatus
       );
-      
+
       if (response) {
         swal.fire({
           title: "User Status Successfully Updated",
@@ -379,10 +383,12 @@ export const RidersApplicant = () => {
     <>
       <div className="flex flex-col min-h-screen">
         <div className="flex flex-grow">
-          <Sidenav />
+          <div className="z-[9999]">
+            <Sidenav />
+          </div>
           <div className=" flex flex-col w-full">
             <Header />
-              <main className="flex-grow p-4 bg-gray-100 overflow-auto">
+            <main className="flex-grow p-4 bg-gray-100 overflow-auto">
               <div className="flex justify-between items-center mb-2">
                 <h1 className="text-2xl font-bold">Rider Requirements</h1>
                 <div className="flex space-x-2">
@@ -425,52 +431,56 @@ export const RidersApplicant = () => {
                   </svg>
                 </div>
               ) : (
-              <div className="p-2">
-                {currentRiders.map((rider, index) => (
-                  <UserCard
-                    key={index}
-                    rider={rider}
-                    onMoreInfo={() => setSelectedUser({ 
-                      verification_status: rider.verification_status, 
-                      user: rider.user, 
-                      requirementphotos: rider.requirementphotos 
-                    })}
-                  />
-                ))}
-              </div>
+                <div className="p-2">
+                  {currentRiders.map((rider, index) => (
+                    <UserCard
+                      key={index}
+                      rider={rider}
+                      onMoreInfo={() =>
+                        setSelectedUser({
+                          verification_status: rider.verification_status,
+                          user: rider.user,
+                          requirementphotos: rider.requirementphotos,
+                        })
+                      }
+                    />
+                  ))}
+                </div>
               )}
             </main>
-              
+
             <footer className="bg-white p-2 shadow-md">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              Prev
-            </button>
-            <span className="text-gray-600 text-sm font-bold">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
-                currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </footer>
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
+                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  Prev
+                </button>
+                <span className="text-gray-600 text-sm font-bold">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`bg-gray-300 px-2 py-1 rounded-md text-sm ${
+                    currentPage === totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </footer>
           </div>
         </div>
         {selectedUser && (
-          <Modal 
-            user={selectedUser.user} 
+          <Modal
+            user={selectedUser.user}
             requirementphotos={selectedUser.requirementphotos}
             verification_status={selectedUser.verification_status}
             onClose={() => setSelectedUser(null)}
@@ -478,11 +488,11 @@ export const RidersApplicant = () => {
             onVerifyClick={handleVerifyClick}
           />
         )}
-    </div>
-{/* Confirmation Modal */}
-<Transition.Root show={isModalOpen} as={Fragment}>
-        <Dialog 
-          as="div" 
+      </div>
+      {/* Confirmation Modal */}
+      <Transition.Root show={isModalOpen} as={Fragment}>
+        <Dialog
+          as="div"
           className="relative z-50"
           onClose={() => setIsModalOpen(false)}
         >
@@ -516,12 +526,18 @@ export const RidersApplicant = () => {
                         as="h3"
                         className="text-lg font-semibold leading-6 text-gray-900"
                       >
-                        Confirm {verificationData?.newStatus === "Verified" ? "Verification" : "Unverification"}
+                        Confirm{" "}
+                        {verificationData?.newStatus === "Verified"
+                          ? "Verification"
+                          : "Unverification"}
                       </Dialog.Title>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
-                          Are you sure you want to {verificationData?.newStatus === "Verified" ? "verify" : "unverify"} this rider?
-
+                          Are you sure you want to{" "}
+                          {verificationData?.newStatus === "Verified"
+                            ? "verify"
+                            : "unverify"}{" "}
+                          this rider?
                         </p>
                       </div>
                     </div>

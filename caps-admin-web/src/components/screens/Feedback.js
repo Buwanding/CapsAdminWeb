@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import Sidenav from "../parts/Sidenav";
 import Header from "../parts/Header";
-import userService from '../../services';
+import userService from "../../services";
 
 export const Feedback = () => {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -27,7 +27,7 @@ export const Feedback = () => {
 
   // Filter feedbacks based on search input
   const filteredFeedbacks = feedbacks.filter((feedback) =>
-    `${feedback.sender_first_name || ''} ${feedback.sender_last_name || ''}`
+    `${feedback.sender_first_name || ""} ${feedback.sender_last_name || ""}`
       .toLowerCase()
       .includes(searchInput.toLowerCase())
   );
@@ -35,7 +35,10 @@ export const Feedback = () => {
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFeedbacks.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredFeedbacks.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   // Change Page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -52,10 +55,12 @@ export const Feedback = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-grow">
-        <Sidenav />
+        <div className="z-[9999]">
+          <Sidenav />
+        </div>
         <div className="flex flex-col w-full">
           <Header />
-          <main className="flex-grow p-2 bg-gray-100">
+          <main className="flex-grow p-2 bg-gray-100 overflow-auto">
             <div className="bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">Feedback</h2>
@@ -88,22 +93,37 @@ export const Feedback = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentItems.map(feedback => (
-                        <tr className="bg-white border-b" key={feedback.feedback_id}>
+                      {currentItems.map((feedback) => (
+                        <tr
+                          className="bg-white border-b"
+                          key={feedback.feedback_id}
+                        >
                           <td className="p-4">
-                            {feedback.sender_first_name && feedback.sender_last_name
+                            {feedback.sender_first_name &&
+                            feedback.sender_last_name
                               ? `${feedback.sender_first_name} ${feedback.sender_last_name}`
-                              : 'N/A'}
+                              : "N/A"}
                           </td>
-                          <td className="p-4">{feedback.comment || 'N/A'}</td>
+                          <td className="p-4">{feedback.comment || "N/A"}</td>
                           <td className="p-4">
-                            {feedback.recipient_first_name && feedback.recipient_last_name
+                            {feedback.recipient_first_name &&
+                            feedback.recipient_last_name
                               ? `${feedback.recipient_first_name} ${feedback.recipient_last_name}`
-                              : 'N/A'}
+                              : "N/A"}
                           </td>
-                          <td className="p-4">{feedback.sender_type ? feedback.sender_type.split('\\').pop() : 'N/A'}</td>
-                          <td className="p-4">{feedback.created_at ? new Date(feedback.created_at).toLocaleDateString() : 'N/A'}</td>
-                          <td className="p-4">{feedback.ride_id || 'N/A'}</td>
+                          <td className="p-4">
+                            {feedback.sender_type
+                              ? feedback.sender_type.split("\\").pop()
+                              : "N/A"}
+                          </td>
+                          <td className="p-4">
+                            {feedback.created_at
+                              ? new Date(
+                                  feedback.created_at
+                                ).toLocaleDateString()
+                              : "N/A"}
+                          </td>
+                          <td className="p-4">{feedback.ride_id || "N/A"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -118,7 +138,9 @@ export const Feedback = () => {
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}
+                className={`bg-gray-300 px-2 py-1 rounded ${
+                  currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+                }`}
               >
                 Previous
               </button>
@@ -127,7 +149,11 @@ export const Feedback = () => {
                   <button
                     key={number}
                     onClick={() => paginate(number)}
-                    className={`px-2 py-1 rounded ${number === currentPage ? 'cursor-not-allowed bg-gray-200' : 'bg-gray-300 font-bold'}`}
+                    className={`px-2 py-1 rounded ${
+                      number === currentPage
+                        ? "cursor-not-allowed bg-gray-200"
+                        : "bg-gray-300 font-bold"
+                    }`}
                   >
                     {number}
                   </button>
@@ -136,16 +162,18 @@ export const Feedback = () => {
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`bg-gray-300 px-2 py-1 rounded ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}
+                className={`bg-gray-300 px-2 py-1 rounded ${
+                  currentPage === totalPages
+                    ? "cursor-not-allowed opacity-50"
+                    : ""
+                }`}
               >
                 Next
               </button>
             </div>
           </footer>
         </div>
-        
       </div>
-      
     </div>
   );
 };

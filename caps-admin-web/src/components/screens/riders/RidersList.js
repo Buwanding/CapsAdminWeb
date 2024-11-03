@@ -6,7 +6,6 @@ import swal from "sweetalert2";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-
 const RidersList = () => {
   const [riders, setRiders] = useState([]);
   const [selectedRiders, setSelectedRiders] = useState([]);
@@ -19,14 +18,13 @@ const RidersList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
-  
 
-    const [confirmationModal, setConfirmationModal] = useState({
-      isOpen: false,
-      action: null,
-      title: "",
-      message: "",
-    });
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    action: null,
+    title: "",
+    message: "",
+  });
 
   useEffect(() => {
     const fetchRiders = async () => {
@@ -38,7 +36,7 @@ const RidersList = () => {
         setFilteredRiders(data);
       } catch (error) {
         console.error("There was an error fetching the riders!", error);
-      }finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -95,102 +93,102 @@ const RidersList = () => {
     });
   };
 
- const showConfirmationModal = (action) => {
-   const isActivate = action === "activate";
-   setConfirmationModal({
-     isOpen: true,
-     action: action,
-     title: `Confirm ${isActivate ? "Activation" : "Disable"}`,
-     message: `Are you sure you want to ${
-       isActivate ? "activate" : "disable"
-     } the selected rider${selectedRiders.length > 1 ? "s" : ""}?`,
-   });
- };
+  const showConfirmationModal = (action) => {
+    const isActivate = action === "activate";
+    setConfirmationModal({
+      isOpen: true,
+      action: action,
+      title: `Confirm ${isActivate ? "Activation" : "Disable"}`,
+      message: `Are you sure you want to ${
+        isActivate ? "activate" : "disable"
+      } the selected rider${selectedRiders.length > 1 ? "s" : ""}?`,
+    });
+  };
 
- const handleActivateRiders = async () => {
-   setConfirmationModal({ ...confirmationModal, isOpen: false });
-   setLoadingActivate(true);
-   try {
-     const responses = await Promise.all(
-       selectedRiders.map((riderId) =>
-         userService.updateUserStatus(riderId, "Active")
-       )
-     );
+  const handleActivateRiders = async () => {
+    setConfirmationModal({ ...confirmationModal, isOpen: false });
+    setLoadingActivate(true);
+    try {
+      const responses = await Promise.all(
+        selectedRiders.map((riderId) =>
+          userService.updateUserStatus(riderId, "Active")
+        )
+      );
 
-     responses.forEach((response) => {
-       const { first_name, last_name } = response.user;
-       swal.fire({
-         title: `${first_name} ${last_name} status updated successfully`,
-         icon: "success",
-         toast: true,
-         timer: 3000,
-         position: "top-right",
-         timerProgressBar: true,
-         showConfirmButton: false,
-       });
-     });
+      responses.forEach((response) => {
+        const { first_name, last_name } = response.user;
+        swal.fire({
+          title: `${first_name} ${last_name} status updated successfully`,
+          icon: "success",
+          toast: true,
+          timer: 3000,
+          position: "top-right",
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      });
 
-     setRiders((prevRiders) =>
-       prevRiders.map((rider) =>
-         selectedRiders.includes(rider.user_id)
-           ? { ...rider, status: "Active" }
-           : rider
-       )
-     );
+      setRiders((prevRiders) =>
+        prevRiders.map((rider) =>
+          selectedRiders.includes(rider.user_id)
+            ? { ...rider, status: "Active" }
+            : rider
+        )
+      );
 
-     setSelectedRiders([]);
-   } catch (error) {
-     console.error("Error activating riders:", error);
-   } finally {
-     setLoadingActivate(false);
-   }
- };
+      setSelectedRiders([]);
+    } catch (error) {
+      console.error("Error activating riders:", error);
+    } finally {
+      setLoadingActivate(false);
+    }
+  };
 
- const handleDisableRiders = async () => {
-   setConfirmationModal({ ...confirmationModal, isOpen: false });
-   setLoadingDisable(true);
-   try {
-     const responses = await Promise.all(
-       selectedRiders.map((riderId) =>
-         userService.updateUserStatus(riderId, "Disabled")
-       )
-     );
+  const handleDisableRiders = async () => {
+    setConfirmationModal({ ...confirmationModal, isOpen: false });
+    setLoadingDisable(true);
+    try {
+      const responses = await Promise.all(
+        selectedRiders.map((riderId) =>
+          userService.updateUserStatus(riderId, "Disabled")
+        )
+      );
 
-     responses.forEach((response) => {
-       const { first_name, last_name } = response.user;
-       swal.fire({
-         title: `${first_name} ${last_name} status updated successfully`,
-         icon: "success",
-         toast: true,
-         timer: 3000,
-         position: "top-right",
-         timerProgressBar: true,
-         showConfirmButton: false,
-       });
-     });
+      responses.forEach((response) => {
+        const { first_name, last_name } = response.user;
+        swal.fire({
+          title: `${first_name} ${last_name} status updated successfully`,
+          icon: "success",
+          toast: true,
+          timer: 3000,
+          position: "top-right",
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      });
 
-     setRiders((prevRiders) =>
-       prevRiders.map((rider) =>
-         selectedRiders.includes(rider.user_id)
-           ? { ...rider, status: "Disabled" }
-           : rider
-       )
-     );
-     setSelectedRiders([]);
-   } catch (error) {
-     console.error("Error disabling riders:", error);
-   } finally {
-     setLoadingDisable(false);
-   }
- };
+      setRiders((prevRiders) =>
+        prevRiders.map((rider) =>
+          selectedRiders.includes(rider.user_id)
+            ? { ...rider, status: "Disabled" }
+            : rider
+        )
+      );
+      setSelectedRiders([]);
+    } catch (error) {
+      console.error("Error disabling riders:", error);
+    } finally {
+      setLoadingDisable(false);
+    }
+  };
 
- const handleConfirmAction = () => {
-   if (confirmationModal.action === "activate") {
-     handleActivateRiders();
-   } else if (confirmationModal.action === "disable") {
-     handleDisableRiders();
-   }
- };
+  const handleConfirmAction = () => {
+    if (confirmationModal.action === "activate") {
+      handleActivateRiders();
+    } else if (confirmationModal.action === "disable") {
+      handleDisableRiders();
+    }
+  };
 
   const isAnySelectedActive = selectedRiders.some((riderId) => {
     const rider = riders.find((r) => r.user_id === riderId);
@@ -216,7 +214,9 @@ const RidersList = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-grow">
-        <Sidenav />
+        <div className="z-[9999]">
+          <Sidenav />
+        </div>
         <div className="flex flex-col w-full">
           <Header />
           <main className="flex-grow p-4 bg-gray-100">

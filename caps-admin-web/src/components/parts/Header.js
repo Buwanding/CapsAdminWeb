@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Menu, Dialog, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +6,13 @@ import { Fragment } from "react";
 import UserIcon from "../pictures/User-icon.png";
 import userService from "../../services";
 import { useAuth } from "../../hooks/useAuth";
+import { AuthContext } from "../../context/AuthContext";
 
 const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { isSideBarMenuOpen, setIsSideBarMenuOpen } = useContext(AuthContext);
 
   const handleLogout = async () => {
     try {
@@ -30,11 +32,36 @@ const Header = () => {
     setIsModalOpen(false);
   };
 
+  const handleMenuSideBar = () => {
+    setIsSideBarMenuOpen(!isSideBarMenuOpen);
+    console.log(isSideBarMenuOpen);
+  };
+
   return (
     <>
       {/* Header Component */}
       <header className="bg-black text-white flex items-center justify-between p-4 relative z-50">
-        <div className="p-4 flex items-center space-x-2">
+        <div className="p-1 flex items-center space-x-2">
+          <div
+            onClick={handleMenuSideBar}
+            className="flex p-1 hover:bg-[#C8A400] rounded-full"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </div>
+
           {/* <img src={logo} alt="Logo" className="h-10 w-10" />
           <span className="text-white font-bold text-xl">PickMeUp</span> */}
         </div>

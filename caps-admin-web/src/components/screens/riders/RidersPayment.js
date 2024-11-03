@@ -43,7 +43,9 @@ const RidersPayment = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-grow">
-        <Sidenav />
+        <div className="z-[9999]">
+          <Sidenav />
+        </div>
         <div className="flex flex-col w-full">
           <Header />
           <main className="flex-grow p-6 bg-gray-50">

@@ -7,6 +7,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSideBarMenuOpen, setIsSideBarMenuOpen] = React.useState(true);
 
@@ -17,6 +18,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated,
         userRole,
         setUserRole,
+        userId,
+        setUserId,
         loading,
         setLoading,
         isSideBarMenuOpen,

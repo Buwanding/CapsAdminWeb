@@ -84,13 +84,14 @@ function AppContent() {
       {" "}
       {/* Added relative positioning */}
       <div className="flex-1 relative">
-        {" "}
+        <div className="z-[9999]">
+          <Sidenav />
+        </div>{" "}
         {/* Added relative positioning */}
         <main
-          className={`
-          w-full transition-[margin] duration-300 ease-in-out
-          ${isSideBarMenuOpen ? "ml-64" : ""}
-        `}
+          className={`flex flex-col min-h-screen ${
+            isSideBarMenuOpen ? "w-[calc(100vw-16rem)] ml-64" : "w-full"
+          }`}
         >
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />

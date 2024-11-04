@@ -80,7 +80,7 @@ export const Feedback = () => {
               {loading ? (
                 <div className="p-4 text-center">Loading...</div>
               ) : (
-                <>
+                <div className="overflow-x-auto">
                   <table className="animate__animated animate__fadeIn w-full bg-gray-100 rounded-lg shadow">
                     <thead>
                       <tr className="bg-gray-200">
@@ -128,7 +128,7 @@ export const Feedback = () => {
                       ))}
                     </tbody>
                   </table>
-                </>
+                </div>
               )}
             </div>
           </main>

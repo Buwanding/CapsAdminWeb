@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { Disclosure } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import logo from "../pictures/Pick-Me-Up-Logo.png";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -43,10 +43,12 @@ const Sidenav = () => {
       {isSideBarMenuOpen && (
         <div className="bg-yellow-500 w-64 h-screen fixed top-0 left-0 overflow-y-auto">
           <div className="p-4 flex justify-between items-center ">
-            <div className="flex space-x-2 items-center">
-              <img src={logo} alt="Logo" className="h-10 w-10" />
-              <span className="text-white font-bold text-xl">PickMeUp</span>
-            </div>
+            <Link to={"/dashboard"}>
+              <div className="flex space-x-2 items-center">
+                <img src={logo} alt="Logo" className="h-10 w-10" />
+                <span className="text-white font-bold text-xl">PickMeUp</span>
+              </div>
+            </Link>
           </div>
           <div className="mt-4">
             {/* Dashboard */}

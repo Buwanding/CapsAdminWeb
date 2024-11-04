@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSideBarMenuOpen, setIsSideBarMenuOpen] = React.useState(true);
+  const [isSideBarMenuOpen, setIsSideBarMenuOpen] = React.useState(false);
 
   return (
     <AuthContext.Provider

@@ -21,7 +21,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { token, role } = await userService.login(email, password);
+      const { token, role, user_id } = await userService.login(email, password);
+      console.log("Creds",token, role, user_id)
 
       if (role !== 1 && role !== 2) {
         setError("Unauthorized access");
@@ -29,7 +30,7 @@ const Login = () => {
         return;
       }
 
-      login(token, role);
+      login(token, role, user_id);
       navigate("/dashboard");
     } catch (err) {
       console.error(err);

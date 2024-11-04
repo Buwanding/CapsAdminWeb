@@ -12,7 +12,7 @@ const UserCard = ({
   openModal,
 }) => {
   const isLoading = loadingUserId === customer.user_id;
-
+  
   return (
     <tr key={customer.user_id}>
       <td className="py-0.5 px-4">
@@ -95,6 +95,8 @@ export const ManageUser = () => {
     message: "",
     customerToUpdate: null,
   });
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -146,12 +148,12 @@ export const ManageUser = () => {
         customer.user_id,
         newStatus
       );
-
+  
       const updatedCustomers = filteredCustomers.map((c) =>
         c.user_id === customer.user_id ? { ...c, status: newStatus } : c
       );
       setFilteredCustomers(updatedCustomers);
-
+  
       const { first_name, last_name } = response.user;
       swal.fire({
         title: `Customer ${first_name} ${last_name} Status Successfully Updated`,
@@ -174,10 +176,13 @@ export const ManageUser = () => {
   };
 
   const openModal = (customer) => {
-    setInfoModal({
-      isOpen: true,
-      customer,
-    });
+    setSelectedCustomer(customer);
+    console.log(customer);
+    setShowModal(true);
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedCustomer(null);
   };
 
   const indexOfLastCustomer = currentPage * customersPerPage;
@@ -252,15 +257,13 @@ export const ManageUser = () => {
                       <th className="py-2 px-4 border-b border-gray-200 text-left">
                         Customer Name
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2 text-center">
+                      <th className="px-4 border-b border-gray-200 py-2 text-center ">
                         Status
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2 text-right">
+                      <th className="px-4 border-b border-gray-200 py-2 text-right ">
                         Action
                       </th>
-                      <th className="px-4 border-b border-gray-200 py-2">
-                        More
-                      </th>
+                      <th className="px-4 border-b border-gray-200 py-2 ">More</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -384,6 +387,30 @@ export const ManageUser = () => {
           </div>
         </Dialog>
       </Transition.Root>
+      {/* Modal for User Info */}
+      {showModal && selectedCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded shadow-md w-96">
+            <h2 className="text-xl font-bold mb-4">User Information</h2>
+            <p>
+              <strong>Name:</strong> {selectedCustomer.first_name}{" "}
+              {selectedCustomer.last_name}
+            </p>
+            <p>
+              <strong>Status:</strong> {selectedCustomer.status}
+            </p>
+            <p>
+              <strong>Mobile Number:</strong> {selectedCustomer.mobile_number}
+            </p>
+            <button
+              className="bg-gray-700 text-white font-bold py-1 px-3 rounded mt-4"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -245,8 +245,8 @@ export const Dashboard = () => {
           </div>
 
           {/* Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-            <div className="animate__animated animate__fadeIn bg-white p-6 rounded-lg shadow-lg">
+          <div className="animate__animated animate__fadeIn grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
               <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
                 Earnings Overview
                 <button

@@ -70,14 +70,10 @@ const userService = {
     }
   },
 
-  signup: async (userData) => {
-    try {
-      const response = await axios.post(API_URL + "signup", userData);
-      return response.data; // Return the response data
-    } catch (error) {
-      console.error("Signup error:", error);
-      throw error;
-    }
+  fetchAdminById: async (userId) => {
+    const response = await axios.get(API_URL + `adminId/${userId}`);
+    
+    return response.data;
   },
 
   getDashboardCounts: async () => {
@@ -125,6 +121,37 @@ const userService = {
       return response.data;
     } catch (error) {
       throw error;
+    }
+  },
+
+  updateAccount: async (userId, formData) => {
+    try {
+      // Debug logs
+      console.log('Updating account for user:', userId);
+      console.log('FormData contents before sending:');
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const url = `${API_URL}update_account/${userId}`;
+      console.log('Request URL:', url);
+
+      const response = await axios.put(url, formData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('Full response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Service error:', error.response || error);
+      throw new Error(
+        error.response?.data?.error || 
+        error.response?.data?.message || 
+        'An error occurred while updating the account.'
+      );
     }
   },
 

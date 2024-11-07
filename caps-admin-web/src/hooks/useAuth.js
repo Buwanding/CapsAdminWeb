@@ -46,6 +46,7 @@ export const useAuth = () => {
     localStorage.removeItem("user_id");
     setIsAuthenticated(false);
     setUserRole(null);
+    setUserId(null);
   }, [setIsAuthenticated, setUserRole, setUserId]);
 
   return {

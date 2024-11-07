@@ -231,19 +231,13 @@ const RidersLocation = () => {
         </div>
         <div className="flex flex-col w-full">
           <Header />
-          <main className="flex-grow p-4 bg-gray-50">
+          <main className="flex-grow p-4 bg-gray-50 overflow-y-auto max-h-screen">
             <div className="mb-6 relative">
               <h1 className="text-2xl font-bold mb-4">Riders Location</h1>
 
-              {error && (
-                <Alert message={error} onClose={() => setError(null)} />
-              )}
+              {error && <Alert message={error} onClose={() => setError(null)} />}
               {warning && (
-                <Alert
-                  message={warning}
-                  type="warning"
-                  onClose={() => setWarning(null)}
-                />
+                <Alert message={warning} type="warning" onClose={() => setWarning(null)} />
               )}
 
               <div className="flex mb-4">

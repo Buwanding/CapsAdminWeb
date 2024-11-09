@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, useContext, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Sidenav from "../../parts/Sidenav";
 import Header from "../../parts/Header";
@@ -7,6 +7,7 @@ import { img_url } from "../../../api_url";
 import defaultProfileLogo from "../../pictures/avatar.png";
 import { X, Loader } from "react-feather";
 import swal from "sweetalert2";
+import { AuthContext } from "../../../context/AuthContext";
 
 // UserCard component
 const UserCard = ({ rider, onMoreInfo }) => {
@@ -68,6 +69,7 @@ const Modal = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { isSideBarMenuOpen } = useContext(AuthContext); // Add this line to get sidebar state
 
   if (!user) return null;
 
@@ -102,7 +104,8 @@ const Modal = ({
   const handleVerificationToggle = async () => {
     setIsLoading(true);
     try {
-      onVerifyClick(user.user_id, verification_status);
+      await onVerifyClick(user.user_id, verification_status);
+      onClose(); // Close the modal after verification is complete
     } catch (error) {
       console.error("Error toggling verification status:", error);
     } finally {
@@ -146,20 +149,33 @@ const Modal = ({
 
   const statusColor = getStatusColor(verification_status);
 
+  // Calculate modal position and width based on sidebar state
+  const modalClasses = `
+    fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50
+    ${isSideBarMenuOpen ? 'pl-64' : ''} transition-all duration-300
+  `;
+
+  const modalContentClasses = `
+    bg-white rounded-lg shadow-lg overflow-y-auto relative
+    w-11/12 max-w-7xl max-h-[90vh]
+    ${isSideBarMenuOpen ? 'ml-0' : 'mx-auto'}
+    p-4 md:p-8
+  `;
+
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-40">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-7xl max-h-[90vh] overflow-y-auto relative">
-        <div className="flex flex-col md:flex-row items-center md:items-start space-x-6">
+    <div className={modalClasses}>
+      <div className={modalContentClasses}>
+        <div className="flex flex-col md:flex-row items-center md:items-start space-x-0 md:space-x-6">
           <div className="flex-shrink-0 mb-4 md:mb-0">
             <img
               src={user.avatar || defaultProfileLogo}
               alt="Avatar"
-              className="h-32 w-32 rounded-full"
+              className="h-24 w-24 md:h-32 md:w-32 rounded-full"
             />
           </div>
-          <div className="flex-grow">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-3xl font-bold">
+          <div className="flex-grow text-center md:text-left">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-0">
                 {user.first_name} {user.last_name}
               </h2>
               <button
@@ -180,15 +196,15 @@ const Modal = ({
             <p className="text-xs">
               <span className={statusColor}>{verification_status}</span>
             </p>
-            <p className="text-gray-600 text-lg mb-1">@{user.user_name}</p>
-            <p className="text-gray-600 text-lg mb-1">{user.mobile_number}</p>
-            <p className="text-gray-600 text-lg mb-1">{user.email}</p>
+            <p className="text-gray-600 text-base md:text-lg mb-1">@{user.user_name}</p>
+            <p className="text-gray-600 text-base md:text-lg mb-1">{user.mobile_number}</p>
+            <p className="text-gray-600 text-base md:text-lg mb-1">{user.email}</p>
           </div>
         </div>
 
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-4">Requirements</h3>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {requirementphotos && requirementphotos.length > 0 ? (
               requirementphotos.map(renderRequirement)
             ) : (
@@ -209,7 +225,7 @@ const Modal = ({
 
       {selectedImage && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg max-w-4xl w-full relative">
+          <div className={`bg-white p-4 rounded-lg shadow-lg relative max-w-4xl w-full mx-4 ${isSideBarMenuOpen ? 'ml-64' : ''}`}>
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute top-2 right-2 text-red-600 hover:text-red-800 transition-colors"
@@ -358,7 +374,10 @@ export const RidersApplicant = () => {
         await handleStatusChange(
           verificationData.userId,
           verificationData.newStatus
+
+          
         );
+        
       }
     } catch (error) {
       console.error("Error updating verification status:", error);

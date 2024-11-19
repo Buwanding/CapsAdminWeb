@@ -283,7 +283,6 @@ export const Dashboard = () => {
     <div className="flex h-screen">
       <Sidenav />
       <div className="flex flex-col w-full">
-        <Header />
         <main className="flex-grow p-3 bg-gray-100 overflow-hidden"> {/* Reduced padding from p-4 to p-3 */}
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3"> {/* Reduced gap-4 to gap-3 and mb-4 to mb-3 */}

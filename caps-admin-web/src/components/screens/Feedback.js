@@ -5,6 +5,7 @@ import userService from "../../services";
 
 export const Feedback = () => {
   const [feedbacks, setFeedbacks] = useState([]);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -13,10 +14,19 @@ export const Feedback = () => {
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
-        const data = await userService.fetchFeedbacks();
-        setFeedbacks(data);
+        const response = await userService.fetchFeedbacks();
+        // Check if response has the expected structure
+        if (response?.success && Array.isArray(response.data)) {
+          console.log(response.data);
+          setFeedbacks(response.data);
+        } else {
+          setFeedbacks([]);
+          setError("Received invalid data format");
+        }
       } catch (error) {
         console.error("There was an error fetching the feedbacks!", error);
+        setError("Failed to fetch feedback data");
+        setFeedbacks([]); // Reset to empty array on error
       } finally {
         setLoading(false);
       }
@@ -25,12 +35,16 @@ export const Feedback = () => {
     fetchFeedbacks();
   }, []);
 
-  // Filter feedbacks based on search input
-  const filteredFeedbacks = feedbacks.filter((feedback) =>
-    `${feedback.sender_first_name || ""} ${feedback.sender_last_name || ""}`
-      .toLowerCase()
-      .includes(searchInput.toLowerCase())
-  );
+  // Rest of the component remains the same
+  const filteredFeedbacks = Array.isArray(feedbacks)
+    ? feedbacks.filter((feedback) =>
+        `${feedback?.sender_first_name || ""} ${
+          feedback?.sender_last_name || ""
+        }`
+          .toLowerCase()
+          .includes(searchInput.toLowerCase())
+      )
+    : [];
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -59,10 +73,9 @@ export const Feedback = () => {
           <Sidenav />
         </div>
         <div className="flex flex-col w-full">
-          <Header />
           <main className="flex-grow p-2 bg-gray-100 overflow-auto">
             <div className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 overflow-x-auto">
                 <h2 className="text-2xl font-bold">Feedback</h2>
                 <div className="flex items-center space-x-2">
                   <input
@@ -77,6 +90,13 @@ export const Feedback = () => {
                   </button>
                 </div>
               </div>
+
+              {error && (
+                <div className="p-4 text-center text-red-600 bg-red-100 rounded-lg mb-4">
+                  {error}
+                </div>
+              )}
+
               {loading ? (
                 <div className="p-4 text-center">Loading...</div>
               ) : (
@@ -96,34 +116,34 @@ export const Feedback = () => {
                       {currentItems.map((feedback) => (
                         <tr
                           className="bg-white border-b"
-                          key={feedback.feedback_id}
+                          key={feedback?.feedback_id || Math.random()}
                         >
                           <td className="p-4">
-                            {feedback.sender_first_name &&
-                            feedback.sender_last_name
+                            {feedback?.sender_first_name &&
+                            feedback?.sender_last_name
                               ? `${feedback.sender_first_name} ${feedback.sender_last_name}`
                               : "N/A"}
                           </td>
-                          <td className="p-4">{feedback.comment || "N/A"}</td>
+                          <td className="p-4">{feedback?.comment || "N/A"}</td>
                           <td className="p-4">
-                            {feedback.recipient_first_name &&
-                            feedback.recipient_last_name
+                            {feedback?.recipient_first_name &&
+                            feedback?.recipient_last_name
                               ? `${feedback.recipient_first_name} ${feedback.recipient_last_name}`
                               : "N/A"}
                           </td>
                           <td className="p-4">
-                            {feedback.sender_type
+                            {feedback?.sender_type
                               ? feedback.sender_type.split("\\").pop()
                               : "N/A"}
                           </td>
                           <td className="p-4">
-                            {feedback.created_at
+                            {feedback?.created_at
                               ? new Date(
                                   feedback.created_at
                                 ).toLocaleDateString()
                               : "N/A"}
                           </td>
-                          <td className="p-4">{feedback.ride_id || "N/A"}</td>
+                          <td className="p-4">{feedback?.ride_id || "N/A"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -177,3 +197,5 @@ export const Feedback = () => {
     </div>
   );
 };
+
+export default Feedback;

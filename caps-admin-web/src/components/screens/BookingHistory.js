@@ -6,20 +6,32 @@ import userService from "../../services";
 export const BookingHistory = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [riderSearch, setRiderSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10); // This is already set to 10
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const data = await userService.fetchHistory();
-        console.log(data); // Log the response data
-        setHistory(data);
+        const response = await userService.fetchHistory();
+        console.log(response); // Log the response data
+
+        // Check if response has the expected structure
+        if (response?.success && Array.isArray(response.data)) {
+          setHistory(response.data);
+        } else if (Array.isArray(response)) {
+          setHistory(response);
+        } else {
+          setHistory([]);
+          setError("Received invalid data format");
+        }
       } catch (error) {
         console.error("There was an error fetching the History!", error);
+        setError("Failed to fetch booking history");
+        setHistory([]);
       } finally {
         setLoading(false);
       }
@@ -32,6 +44,7 @@ export const BookingHistory = () => {
     setCustomerSearch("");
     setRiderSearch("");
     setStartDate("");
+    setCurrentPage(1); // Reset to first page when clearing search
   };
 
   const filteredHistory = history.filter((booking) => {
@@ -42,13 +55,6 @@ export const BookingHistory = () => {
       ? `${booking.rider.first_name} ${booking.rider.last_name}`.toLowerCase()
       : "";
     const rideDate = new Date(booking.ride_date);
-    const formattedDate = rideDate.toLocaleDateString();
-    const formattedTime = rideDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-    const rideDateTime = `${formattedDate} ${formattedTime}`;
 
     const start = startDate
       ? new Date(startDate).toISOString().split("T")[0]
@@ -64,16 +70,27 @@ export const BookingHistory = () => {
     );
   });
 
-  // Pagination Logic
+  // Pagination Logic - Ensure exactly 10 items per page
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredHistory.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Reset to first page if current page is out of bounds
+  useEffect(() => {
+    const maxPage = Math.ceil(filteredHistory.length / itemsPerPage);
+    if (currentPage > maxPage && maxPage > 0) {
+      setCurrentPage(1);
+    }
+  }, [filteredHistory.length, currentPage, itemsPerPage]);
 
   // Change Page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Calculate Total Pages
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredHistory.length / itemsPerPage)
+  );
 
   // Generate Page Numbers
   const pageNumbers = [];
@@ -87,8 +104,7 @@ export const BookingHistory = () => {
         <Sidenav />
       </div>
       <div className="flex flex-col flex-1 min-w-0">
-        <Header />
-        <main className="flex-1 p-3 bg-gray-100 overflow-auto">
+        <main className="flex-1 p-3 bg-gray-100 overflow-x-auto">
           <div className="min-w-fit">
             <div className="bg-white shadow rounded-lg flex flex-col">
               <div className="p-4 border-b border-gray-200 overflow-x-auto">
@@ -100,11 +116,17 @@ export const BookingHistory = () => {
                       placeholder="Search Customer"
                       className="border border-gray-300 rounded px-4 py-2"
                       value={customerSearch}
-                      onChange={(e) => setCustomerSearch(e.target.value)}
+                      onChange={(e) => {
+                        setCustomerSearch(e.target.value);
+                        setCurrentPage(1); // Reset to first page on search
+                      }}
                     />
                     <button
                       className="px-4 py-2 bg-gray-200 rounded-lg"
-                      onClick={() => setCustomerSearch("")}
+                      onClick={() => {
+                        setCustomerSearch("");
+                        setCurrentPage(1);
+                      }}
                     >
                       Clear
                     </button>
@@ -115,11 +137,17 @@ export const BookingHistory = () => {
                       placeholder="Search Rider"
                       className="border border-gray-300 rounded px-4 py-2"
                       value={riderSearch}
-                      onChange={(e) => setRiderSearch(e.target.value)}
+                      onChange={(e) => {
+                        setRiderSearch(e.target.value);
+                        setCurrentPage(1); // Reset to first page on search
+                      }}
                     />
                     <button
                       className="px-4 py-2 bg-gray-200 rounded-lg"
-                      onClick={() => setRiderSearch("")}
+                      onClick={() => {
+                        setRiderSearch("");
+                        setCurrentPage(1);
+                      }}
                     >
                       Clear
                     </button>
@@ -129,11 +157,17 @@ export const BookingHistory = () => {
                       type="date"
                       className="border border-gray-300 rounded px-4 py-2"
                       value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      onChange={(e) => {
+                        setStartDate(e.target.value);
+                        setCurrentPage(1); // Reset to first page on date change
+                      }}
                     />
                     <button
                       className="px-4 py-2 bg-gray-200 rounded-lg"
-                      onClick={() => setStartDate("")}
+                      onClick={() => {
+                        setStartDate("");
+                        setCurrentPage(1);
+                      }}
                     >
                       Clear
                     </button>
@@ -146,11 +180,17 @@ export const BookingHistory = () => {
                   </button>
                 </div>
               </div>
-              {/*  */}
+
+              {error && (
+                <div className="p-4 text-center text-red-600 bg-red-100">
+                  {error}
+                </div>
+              )}
+
               {loading ? (
                 <div className="p-4 text-center">Loading...</div>
               ) : (
-                <div className=" overflow-x-auto">
+                <div className="overflow-x-auto">
                   <table className="animate__animated animate__fadeIn min-w-full bg-white">
                     <thead>
                       <tr>
@@ -195,7 +235,10 @@ export const BookingHistory = () => {
                         const rideDateTime = `${formattedDate} ${formattedTime}`;
 
                         return (
-                          <tr key={index}>
+                          <tr
+                            key={booking.ride_id || index}
+                            className="hover:bg-gray-50"
+                          >
                             <td className="py-2 px-4 border-b border-gray-200">
                               {booking.ride_id || "N/A"}
                             </td>
@@ -281,3 +324,5 @@ export const BookingHistory = () => {
     </div>
   );
 };
+
+export default BookingHistory;

@@ -205,7 +205,6 @@ export const ManageUser = () => {
         <Sidenav />
       </div>
       <div className="flex-grow flex flex-col">
-        <Header className="fixed" />
         <main className="flex-grow bg-gray-100">
           <div className="p-2">
             <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -251,6 +250,7 @@ export const ManageUser = () => {
                   </svg>
                 </div>
               ) : (
+                <div className="overflow-auto">
                 <table className="animate__animated animate__fadeIn min-w-full bg-white table-auto">
                   <thead>
                     <tr>
@@ -278,6 +278,7 @@ export const ManageUser = () => {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           </div>

@@ -196,7 +196,6 @@ const ManageAccount = () => {
         <Sidenav />
       </div>
       <div className="flex flex-col flex-1 min-w-0">
-        <Header />
         <div className="overflow-y-auto p-4">
           <div className="flex-grow flex items-center justify-center">
             <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
